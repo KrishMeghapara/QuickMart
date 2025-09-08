@@ -73,16 +73,27 @@ export function CartProvider({ children }) {
     }
   }, [token, user, loadCart]);
 
-  // Auto-refresh cart every 15 seconds
+  // Auto-refresh cart every 2 seconds (except on payment page)
   useEffect(() => {
     if (!token || !user) return;
+    
+    // Don't auto-refresh on payment page
+    if (window.location.pathname === '/payment') return;
 
-    const interval = setInterval(() => {
-      loadCart();
+    const interval = setInterval(async () => {
+      try {
+        // Don't refresh if user is on payment page
+        if (window.location.pathname === '/payment') return;
+        
+        const cartData = await apiService.getMyCart();
+        dispatch({ type: "SET_CART", items: cartData });
+      } catch (error) {
+        console.error('Auto-refresh failed:', error);
+      }
     }, 2000); // 2 seconds
 
     return () => clearInterval(interval);
-  }, [token, user, loadCart]);
+  }, [token, user]);
 
   const addToCart = async (product) => {
     if (!token) {

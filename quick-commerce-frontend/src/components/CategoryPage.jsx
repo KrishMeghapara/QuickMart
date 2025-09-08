@@ -28,11 +28,13 @@ import {
 } from '@mui/icons-material';
 import ProductGrid from './ProductGrid';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useCart } from './CartContext';
 import apiService from '../services/apiService';
 
-export default function CategoryPage({ onAddToCart }) {
+export default function CategoryPage() {
   const { categoryId } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState(null);
@@ -274,7 +276,7 @@ export default function CategoryPage({ onAddToCart }) {
             {/* Products Grid */}
             <ProductGrid
               products={filteredProducts}
-              onAddToCart={onAddToCart}
+              onAddToCart={addToCart}
               viewMode={viewMode}
               loading={loading}
             />

@@ -127,40 +127,37 @@ export default function ProductGrid({
               onMouseLeave={() => setHoveredProduct(null)}
             >
               <Box sx={{ position: 'relative', overflow: 'hidden' }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={product.productImage || '/api/placeholder/300/200'}
-                  alt={`${product.productName} - ₹${product.productPrice}`}
-                  loading="lazy"
-                  sx={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s ease',
-                    transform: hoveredProduct === product.productID ? 'scale(1.05)' : 'scale(1)',
-                  }}
-                />
+                {product.productImg && product.productImg !== 'false' && product.productImg !== '' ? (
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={product.productImg}
+                    alt={`${product.productName} - ₹${product.productPrice}`}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                    sx={{
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s ease',
+                      transform: hoveredProduct === product.productID ? 'scale(1.05)' : 'scale(1)',
+                    }}
+                  />
+                ) : null}
+                <Box sx={{
+                  height: 200,
+                  display: (!product.productImg || product.productImg === 'false' || product.productImg === '') ? 'flex' : 'none',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f3f4f6',
+                  fontSize: '4rem',
+                  color: '#9ca3af'
+                }}>
+                  📦
+                </Box>
                 
-                {/* Favorite Button */}
-                <IconButton
-                  sx={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    backdropFilter: 'blur(10px)',
-                    '&:hover': { backgroundColor: 'rgba(255,255,255,1)' }
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(product.productID);
-                  }}
-                >
-                  {favorites.has(product.productID) ? (
-                    <FavoriteFilledIcon sx={{ color: '#ef4444' }} />
-                  ) : (
-                    <FavoriteIcon sx={{ color: '#6b7280' }} />
-                  )}
-                </IconButton>
+
 
                 {/* Stock Status */}
                 <Chip
@@ -254,63 +251,37 @@ export default function ProductGrid({
                     ₹{product.productPrice}
                   </Typography>
                   
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                  <Tooltip title="Add to Cart">
                     <Button
                       variant="contained"
                       size="small"
-                      startIcon={<StarIcon />}
+                      disabled={product.stockQuantity === 0}
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/product/${product.productID}#reviews`);
+                        onAddToCart?.(product);
                       }}
+                      aria-label={`Add ${product.productName} to cart`}
                       sx={{
-                        backgroundColor: '#fbbf24',
-                        color: 'white',
-                        fontSize: '0.75rem',
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 2,
+                        minWidth: 'auto',
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+                        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
                         '&:hover': {
-                          backgroundColor: '#f59e0b',
-                          transform: 'translateY(-1px)'
+                          background: 'linear-gradient(135deg, #6d28d9, #5b21b6)',
+                          transform: 'scale(1.05)',
+                          boxShadow: '0 6px 16px rgba(124, 58, 237, 0.4)',
+                        },
+                        '&:disabled': {
+                          background: '#d1d5db',
+                          color: '#9ca3af'
                         }
                       }}
                     >
-                      Review
+                      <AddIcon />
                     </Button>
-                    
-                    <Tooltip title="Add to Cart">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={product.stockQuantity === 0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAddToCart?.(product);
-                        }}
-                        aria-label={`Add ${product.productName} to cart`}
-                        sx={{
-                          minWidth: 'auto',
-                          width: 40,
-                          height: 40,
-                          borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
-                          '&:hover': {
-                            background: 'linear-gradient(135deg, #6d28d9, #5b21b6)',
-                            transform: 'scale(1.05)',
-                            boxShadow: '0 6px 16px rgba(124, 58, 237, 0.4)',
-                          },
-                          '&:disabled': {
-                            background: '#d1d5db',
-                            color: '#9ca3af'
-                          }
-                        }}
-                      >
-                        <AddIcon />
-                      </Button>
-                    </Tooltip>
-                  </Box>
+                  </Tooltip>
                 </Box>
               </CardContent>
             </Card>
