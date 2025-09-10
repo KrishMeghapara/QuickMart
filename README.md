@@ -1,9 +1,7 @@
 # 🛒 QuickMart – Full-Stack E-Commerce Platform  
 
-![React](https://img.shields.io/badge/React-18.2.0-blue)  
-![.NET Core](https://img.shields.io/badge/.NET%2520Core-7.0-purple)  
-![SQL Server](https://img.shields.io/badge/SQL%2520Server-2022-red)  
-![License: MIT](https://img.shields.io/badge/License-MIT-green)  
+![React](https://img.shields.io/badge/React-18.2.0-blue)   ![.NET Core](https://img.shields.io/badge/.NET%2520Core-7.0-purple)  
+![SQL Server](https://img.shields.io/badge/SQL%2520Server-2022-red)  ![License: MIT](https://img.shields.io/badge/License-MIT-green)  
 
 QuickMart is a modern **full-stack e-commerce web application** built with **React (Frontend)** and **.NET Core (Backend)**, powered by **SQL Server** for data management.  
 It offers a smooth, intuitive shopping experience with features ranging from responsive design and authentication to product browsing, reviews, maps, and secure checkout.  
