@@ -55,11 +55,18 @@ export function CartProvider({ children }) {
 
     try {
       dispatch({ type: "SET_LOADING", loading: true });
+      // Small delay to ensure token is properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
       const cartData = await apiService.getMyCart();
       dispatch({ type: "SET_CART", items: cartData });
     } catch (error) {
       console.error('Error loading cart:', error);
-      dispatch({ type: "SET_ERROR", error: 'Failed to load cart' });
+      // Don't show error immediately after login, retry once
+      setTimeout(() => {
+        if (token && user) {
+          loadCart();
+        }
+      }, 1000);
     }
   }, [token, user]);
 
