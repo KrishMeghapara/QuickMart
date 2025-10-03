@@ -26,16 +26,16 @@ import {
   Favorite as FavoriteIcon,
   FilterList as FilterListIcon,
 } from '@mui/icons-material';
-import { useCart } from './CartContext';
-import { useAuth } from './AuthContext';
+import { useCart } from '../features/cart/CartContext';
+import { useAuth } from '../features/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import EnhancedSearch from './EnhancedSearch';
+import EnhancedSearch from '../components/ui/EnhancedSearch';
 
 /* ---------- Theme Constants ---------- */
 const COLORS = {
-  primary: '#667eea',
-  secondary: '#764ba2',
-  accent: '#3498db',
+  primary: '#2563eb',
+  secondary: '#1d4ed8',
+  accent: '#2563eb',
   lightText: '#1f2937',
   subtleText: '#64748b',
   error: '#ef4444',
@@ -60,7 +60,7 @@ const Search = styled('div')(({ theme }) => ({
   },
   '&:focus-within': {
     border: '1px solid var(--brand)',
-    boxShadow: '0 0 0 3px rgba(76, 29, 149, 0.1), 0 4px 12px rgba(0,0,0,0.08)',
+    boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1), 0 4px 12px rgba(0,0,0,0.08)',
   },
   [theme.breakpoints.up('sm')]: {
     marginLeft: theme.spacing(2),

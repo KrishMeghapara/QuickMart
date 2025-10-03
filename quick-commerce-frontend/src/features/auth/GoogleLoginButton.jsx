@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
 import { useGoogleLogin } from '@react-oauth/google';
-import apiService from '../services/apiService';
+import apiService from '../../services/apiService';
 
 const GoogleLoginButton = ({ onLogin, disabled = false }) => {
   const googleLogin = useGoogleLogin({

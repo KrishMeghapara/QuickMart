@@ -20,8 +20,8 @@ import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { useCart } from "./CartContext";
 import { useNavigate } from 'react-router-dom';
-import { CartSkeleton } from "./LoadingStates";
-import { useToast } from "./ToastProvider";
+import { CartSkeleton } from "../../components/common/LoadingStates";
+import { useToast } from "../../components/common/ToastProvider";
 import "./CartDrawer.css";
 
 export default function CartDrawer({ open, onClose }) {

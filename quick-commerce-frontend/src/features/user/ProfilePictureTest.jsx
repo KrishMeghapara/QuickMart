@@ -8,7 +8,7 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import ProfilePictureUpload from './ProfilePictureUpload';
 
 const ProfilePictureTest = () => {

@@ -15,9 +15,10 @@ import {
   Alert
 } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
-import { useAuth } from './AuthContext';
-import { useToast } from './ToastProvider';
-import apiService from '../services/apiService';
+import { useAuth } from '../auth/AuthContext';
+import { useToast } from '../../components/common/ToastProvider';
+import apiService from '../../services/apiService';
+import { colors } from '../../theme/designTokens';
 
 export default function ProductReviews({ productId }) {
   const [reviews, setReviews] = useState([]);
@@ -87,7 +88,7 @@ export default function ProductReviews({ productId }) {
       <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2 }}>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h3" sx={{ fontWeight: 700, color: '#7c3aed' }}>
+            <Typography variant="h3" sx={{ fontWeight: 600, color: colors.primary[500] }}>
               {averageRating.toFixed(1)}
             </Typography>
             <Rating value={averageRating} readOnly precision={0.1} />
@@ -113,7 +114,7 @@ export default function ProductReviews({ productId }) {
                   <Box sx={{ 
                     width: `${reviews.length > 0 ? (count / reviews.length) * 100 : 0}%`,
                     height: '100%',
-                    bgcolor: '#7c3aed',
+                    bgcolor: colors.primary[500],
                     transition: 'width 0.3s ease'
                   }} />
                 </Box>
@@ -130,8 +131,8 @@ export default function ProductReviews({ productId }) {
             variant="contained"
             onClick={() => setShowReviewDialog(true)}
             sx={{ 
-              bgcolor: '#7c3aed',
-              '&:hover': { bgcolor: '#6d28d9' }
+              bgcolor: colors.primary[500],
+              '&:hover': { bgcolor: colors.primary[600] }
             }}
           >
             Write a Review
@@ -144,7 +145,7 @@ export default function ProductReviews({ productId }) {
         {reviews.map((review, index) => (
           <Paper key={review.reviewID} sx={{ p: 3, mb: 2, borderRadius: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-              <Avatar sx={{ bgcolor: '#7c3aed' }}>
+              <Avatar sx={{ bgcolor: colors.primary[500] }}>
                 {review.user?.firstName?.[0] || 'U'}
               </Avatar>
               <Box sx={{ flex: 1 }}>
@@ -208,7 +209,7 @@ export default function ProductReviews({ productId }) {
             onClick={handleSubmitReview}
             variant="contained"
             disabled={submitting}
-            sx={{ bgcolor: '#7c3aed', '&:hover': { bgcolor: '#6d28d9' } }}
+            sx={{ bgcolor: colors.primary[500], '&:hover': { bgcolor: colors.primary[600] } }}
           >
             {submitting ? 'Submitting...' : 'Submit Review'}
           </Button>

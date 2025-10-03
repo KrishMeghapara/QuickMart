@@ -3,24 +3,36 @@ import { AppBar, Toolbar, Typography, IconButton, Badge, Box, Container } from "
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
-import ProductGrid from "./components/ProductGrid";
-import { useCart } from "./components/CartContext";
-import CartDrawer from "./components/CartDrawer";
-import HomePage from "./components/HomePage";
-import Header from "./components/Header";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import UserProfile from "./components/UserProfile";
-import { useAuth } from "./components/AuthContext";
-import AddAddressForm from "./components/AddAddressForm";
-import ApiTest from "./components/ApiTest";
-import PaymentPage from "./components/PaymentPage";
-import ProfilePictureTest from "./components/ProfilePictureTest";
+// Pages
+import HomePage from "./pages/HomePage";
+import CategoryPage from "./pages/CategoryPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import PaymentPage from "./pages/PaymentPage";
+import UserProfile from "./pages/UserProfile";
+
+// Features
+import { useAuth } from "./features/auth/AuthContext";
+import LoginForm from "./features/auth/LoginForm";
+import RegisterForm from "./features/auth/RegisterForm";
+import { useCart } from "./features/cart/CartContext";
+import CartDrawer from "./features/cart/CartDrawer";
+import ProductGrid from "./features/products/ProductGrid";
+import AddAddressForm from "./features/user/AddAddressForm";
+import ProfilePictureTest from "./features/user/ProfilePictureTest";
+
+// Layouts
+import Header from "./layouts/Header";
+
+// Components
+import ToastProvider from "./components/common/ToastProvider";
+import ApiTest from "./components/ui/ApiTest";
+
+// Services
 import apiService from "./services/apiService";
-import ToastProvider from "./components/ToastProvider";
-import CategoryPage from "./components/CategoryPage";
-import ProductDetailPage from "./components/ProductDetailPage";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import theme from "./theme/theme";
 import "./App.css";
 
 function AuthRoutes() {
@@ -158,10 +170,13 @@ export default function App() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <ToastProvider>
-      <Router>
-        {isAuthenticated ? <MainApp /> : <AuthRoutes />}
-      </Router>
-    </ToastProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ToastProvider>
+        <Router>
+          {isAuthenticated ? <MainApp /> : <AuthRoutes />}
+        </Router>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

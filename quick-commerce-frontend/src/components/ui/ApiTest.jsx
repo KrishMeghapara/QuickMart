@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Alert, Paper } from '@mui/material';
-import apiService from '../services/apiService';
+import apiService from '../../services/apiService';
 
 const ApiTest = () => {
   const [testResult, setTestResult] = useState(null);

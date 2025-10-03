@@ -35,7 +35,7 @@ import {
   Star
 } from '@mui/icons-material';
 import GoogleLoginButton from './GoogleLoginButton';
-import apiService from '../services/apiService';
+import apiService from '../../services/apiService';
 
 const RegisterForm = ({ onRegister }) => {
   const [userName, setUserName] = useState('');

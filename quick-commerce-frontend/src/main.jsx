@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
-import { CartProvider } from './components/CartContext'
-import { AuthProvider } from './components/AuthContext';
-import ErrorBoundary from './components/ErrorBoundary';
+import { CartProvider } from './features/cart/CartContext';
+import { AuthProvider } from './features/auth/AuthContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import 'leaflet/dist/leaflet.css';
 
 // Debug: Check if environment variable is loaded

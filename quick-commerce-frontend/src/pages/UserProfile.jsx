@@ -51,11 +51,11 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
-import { useAuth } from './AuthContext';
-import { useCart } from './CartContext';
+import { useAuth } from '../features/auth/AuthContext';
+import { useCart } from '../features/cart/CartContext';
 import './UserProfile.css';
-import AddAddressForm from './AddAddressForm';
-import ProfilePictureUpload from './ProfilePictureUpload';
+import AddAddressForm from '../features/user/AddAddressForm';
+import ProfilePictureUpload from '../features/user/ProfilePictureUpload';
 import apiService from '../services/apiService';
 
 const API_BASE_URL = 'http://localhost:5236/api';

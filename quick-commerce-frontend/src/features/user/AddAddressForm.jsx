@@ -26,7 +26,7 @@ import {
   Save as SaveIcon,
   MyLocation as MyLocationIcon
 } from '@mui/icons-material';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import AddressMap from './AddressMap';
 
 const DEFAULT_CENTER = { lat: 28.6139, lng: 77.2090 };

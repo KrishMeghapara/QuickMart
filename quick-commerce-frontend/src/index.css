@@ -1,5 +1,5 @@
-/* Import Inter font with multiple weights */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Import Inter font with standard weights only */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -15,9 +15,9 @@
   scroll-behavior: smooth;
   
   /* Luxury Color System Variables */
-  --brand: #4C1D95;
-  --brand-2: #7C3AED;
-  --brand-gradient: linear-gradient(135deg, #4C1D95, #7C3AED);
+  --brand: #2563eb;
+  --brand-2: #1d4ed8;
+  --brand-gradient: linear-gradient(135deg, #2563eb, #1d4ed8);
   --accent: #0EA5E9;
   --accent-2: #38BDF8;
   --accent-gradient: linear-gradient(135deg, #0EA5E9, #38BDF8);
@@ -40,7 +40,7 @@
   --glass: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.25));
   --card-shadow: 0 10px 28px rgba(0,0,0,0.06);
   --soft-shadow: 0 6px 16px rgba(0,0,0,0.05);
-  --glow-purple: 0 6px 24px rgba(124, 58, 237, 0.45);
+  --glow-purple: 0 6px 24px rgba(37, 99, 235, 0.45);
   --glow-blue: 0 6px 24px rgba(14, 165, 233, 0.4);
   --glow-green: 0 6px 24px rgba(5, 150, 105, 0.35);
 }
@@ -101,21 +101,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 3rem;
-  font-weight: 900;
+  font-size: 2.5rem;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -1px;
 }
 
 h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 h3 {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 p {
@@ -199,7 +204,7 @@ button:disabled {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #1e40af, #6d28d9);
+  background: linear-gradient(180deg, #1e40af, #1d4ed8);
 }
 
 ::-webkit-scrollbar-corner {
@@ -494,16 +499,16 @@ input::placeholder, textarea::placeholder {
 
 /* Link fixes */
 a {
-  color: #4C1D95 !important;
+  color: #2563eb !important;
 }
 
 a:hover {
-  color: #7C3AED !important;
+  color: #1d4ed8 !important;
 }
 
 /* Accessibility improvements */
 *:focus {
-  outline: 2px solid #7c3aed;
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 

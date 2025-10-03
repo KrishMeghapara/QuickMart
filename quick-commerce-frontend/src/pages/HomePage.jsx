@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Box, CircularProgress, Container, Typography, Fade, Alert, Button } from "@mui/material";
-import { useCart } from "./CartContext";
 import { useNavigate } from "react-router-dom";
-import ProductCarousel from "./ProductCarousel";
-import ProductGrid from "./ProductGrid";
-import { PageSkeleton } from "./LoadingStates";
-import RetryComponent from "./RetryComponent";
-import HeroSection from "./HeroSection";
+import { useCart } from "../features/cart/CartContext";
+import ProductCarousel from "../features/products/ProductCarousel";
+import ProductGrid from "../features/products/ProductGrid";
+import { PageSkeleton } from "../components/common/LoadingStates";
+import RetryComponent from "../components/common/RetryComponent";
+import ModernHero from "../layouts/ModernHero";
 
 import apiService from "../services/apiService";
 import { withCache } from "../utils/cache";
@@ -98,11 +98,9 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
   }
 
   return (
-    <Box className="main-bg" sx={{ minHeight: '100vh', width: '100vw', overflowX: 'hidden', boxSizing: 'border-box' }}>
-      <Box sx={{ width: '100vw', px: { xs: 0, md: 0 }, mb: 4 }}>
-        <HeroSection />
-      </Box>
-      <Box className="maxw-1200 px-4" sx={{ py: 4 }}>
+    <Box sx={{ minHeight: '100vh', width: '100%', bgcolor: '#f8fafc' }}>
+      <ModernHero />
+      <Container maxWidth="xl" sx={{ py: 6 }} id="products-section">
             {showFilters ? (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -203,7 +201,7 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
               )
             )}
 
-      </Box>
+      </Container>
     </Box>
   );
 } 

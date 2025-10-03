@@ -18,7 +18,7 @@ import {
   Avatar,
   Chip
 } from '@mui/material';
-import apiService from '../services/apiService';
+import apiService from '../../services/apiService';
 import GoogleLoginButton from './GoogleLoginButton';
 import { 
   Email as EmailIcon, 
@@ -34,6 +34,7 @@ import {
   CheckCircle,
   Star
 } from '@mui/icons-material';
+import { colors, shadows } from '../../theme/designTokens';
 
 const LoginForm = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -112,7 +113,14 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', py: 4 }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #f5f3ff, #eef2ff)',
+      display: 'flex',
+      alignItems: 'center',
+      py: 4
+    }}>
+    <Container maxWidth="lg">
       <Grid container spacing={4} alignItems="center">
         {/* Left Side - Brand & Features */}
         <Grid item xs={12} md={6}>
@@ -126,13 +134,15 @@ const LoginForm = ({ onLogin }) => {
                     width: 56, 
                     height: 56, 
                     mr: 2,
-                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
+                    boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)'
                   }}>
                     <StorefrontIcon sx={{ fontSize: 28 }} />
                   </Avatar>
-                  <Typography variant="h3" sx={{ 
-                    fontWeight: 700, 
-                    background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                  <Typography sx={{ 
+                    fontFamily: 'Poppins, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '2.5rem',
+                    background: 'linear-gradient(45deg, #2563eb 0%, #1d4ed8 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
@@ -140,10 +150,10 @@ const LoginForm = ({ onLogin }) => {
                     QuickCommerce
                   </Typography>
                 </Box>
-                <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography variant="h5" sx={{ mb: 1, color: '#1e293b', fontSize: '1.5rem', fontWeight: 600 }}>
                   Welcome back!
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" sx={{ color: '#64748b' }}>
                   Sign in to your account to continue shopping
                 </Typography>
               </Box>
@@ -153,19 +163,19 @@ const LoginForm = ({ onLogin }) => {
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   Why choose QuickCommerce?
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {[
-                    { icon: <ShoppingCart />, text: 'Fast & secure checkout', color: '#3b82f6' },
-                    { icon: <LocalShipping />, text: 'Free delivery on orders over $50', color: '#10b981' },
-                    { icon: <Security />, text: '100% secure payment processing', color: '#f59e0b' },
-                    { icon: <Redeem />, text: 'Exclusive member rewards', color: '#8b5cf6' }
+                    { icon: <ShoppingCart />, text: 'Fast & secure checkout', color: '#7C3AED' },
+                    { icon: <LocalShipping />, text: 'Free delivery on orders over $50', color: '#7C3AED' },
+                    { icon: <Security />, text: '100% secure payment processing', color: '#7C3AED' },
+                    { icon: <Redeem />, text: 'Exclusive member rewards', color: '#7C3AED' }
                   ].map((feature, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 0.5 }}>
                       <Avatar sx={{ 
-                        bgcolor: feature.color, 
+                        bgcolor: '#E0E7FF',
+                        color: feature.color,
                         width: 40, 
-                        height: 40,
-                        boxShadow: `0 2px 8px ${feature.color}40`
+                        height: 40
                       }}>
                         {feature.icon}
                       </Avatar>
@@ -179,10 +189,10 @@ const LoginForm = ({ onLogin }) => {
 
               {/* Testimonials */}
               <Box sx={{ 
-                bgcolor: 'rgba(102, 126, 234, 0.05)', 
+                bgcolor: 'rgba(37, 99, 235, 0.05)', 
                 borderRadius: 3, 
                 p: 3, 
-                border: '1px solid rgba(102, 126, 234, 0.1)'
+                border: '1px solid rgba(37, 99, 235, 0.1)'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -206,18 +216,17 @@ const LoginForm = ({ onLogin }) => {
             <Card sx={{ 
               maxWidth: 480, 
               mx: 'auto',
-              borderRadius: 4,
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
-              backdropFilter: 'blur(10px)'
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              border: '1px solid #f1f5f9',
+              background: 'white'
             }}>
-              <CardContent sx={{ p: 4 }}>
+              <CardContent sx={{ p: 5 }}>
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: '#1e293b' }}>
                     Sign In
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" sx={{ color: '#64748b' }}>
                     Access your account to start shopping
                   </Typography>
                 </Box>
@@ -237,7 +246,18 @@ const LoginForm = ({ onLogin }) => {
                     onChange={handleEmailChange}
                     error={!!emailError}
                     helperText={emailError}
-                    sx={{ mb: 3 }}
+                    sx={{ 
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#2563eb',
+                          boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -255,7 +275,18 @@ const LoginForm = ({ onLogin }) => {
                     onChange={handlePasswordChange}
                     error={!!passwordError}
                     helperText={passwordError}
-                    sx={{ mb: 3 }}
+                    sx={{ 
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#2563eb',
+                          boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -284,12 +315,12 @@ const LoginForm = ({ onLogin }) => {
                       py: 1.5,
                       mb: 3,
                       borderRadius: 2,
-                      background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                      background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        background: 'linear-gradient(45deg, #5a67d8 0%, #6b46c1 100%)',
-                        boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
-                        transform: 'translateY(-2px)'
+                        background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)'
                       },
                       '&:disabled': {
                         background: 'linear-gradient(45deg, #cbd5e0 0%, #a0aec0 100%)',
@@ -325,11 +356,14 @@ const LoginForm = ({ onLogin }) => {
                       variant="text" 
                       onClick={() => window.location.href = '/register'}
                       sx={{ 
-                        color: 'primary.main', 
+                        background: 'linear-gradient(135deg, #7C3AED, #4C1D95)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
                         fontWeight: 600,
                         textTransform: 'none',
                         '&:hover': {
-                          background: 'rgba(102, 126, 234, 0.1)'
+                          background: 'rgba(124, 58, 237, 0.1)'
                         }
                       }}
                     >
@@ -343,6 +377,7 @@ const LoginForm = ({ onLogin }) => {
         </Grid>
       </Grid>
     </Container>
+    </Box>
   );
 };
 

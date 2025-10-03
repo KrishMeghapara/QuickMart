@@ -23,10 +23,11 @@ import {
   Category as CategoryIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from './CartContext';
-import { useToast } from './ToastProvider';
-import ProductReviews from './ProductReviews';
+import { useCart } from '../features/cart/CartContext';
+import { useToast } from '../components/common/ToastProvider';
+import ProductReviews from '../features/products/ProductReviews';
 import apiService from '../services/apiService';
+import { colors } from '../theme/designTokens';
 
 export default function ProductDetailPage() {
   const { productId } = useParams();
@@ -156,7 +157,7 @@ export default function ProductDetailPage() {
           <Grid item xs={12} md={6}>
             <Box sx={{ pl: { md: 2 } }}>
               {/* Product Name & Category */}
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#111827' }}>
+              <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: '#111827' }}>
                 {product.productName}
               </Typography>
               
@@ -164,7 +165,7 @@ export default function ProductDetailPage() {
                 <Chip
                   label={category.categoryName}
                   size="small"
-                  sx={{ mb: 2, bgcolor: '#e0e7ff', color: '#7c3aed' }}
+                  sx={{ mb: 2, bgcolor: colors.primary[100], color: colors.primary[500] }}
                 />
               )}
 
@@ -178,7 +179,7 @@ export default function ProductDetailPage() {
 
               {/* Price */}
               <Box sx={{ mb: 3 }}>
-                <Typography variant="h3" sx={{ fontWeight: 700, color: '#7c3aed', mb: 1 }}>
+                <Typography variant="h3" sx={{ fontWeight: 600, color: colors.primary[500], mb: 1 }}>
                   ₹{product.productPrice}
                 </Typography>
                 {product.productPrice > 150 && (
@@ -234,8 +235,8 @@ export default function ProductDetailPage() {
                   disabled={!product.isInStock}
                   sx={{
                     flex: 1,
-                    bgcolor: '#7c3aed',
-                    '&:hover': { bgcolor: '#6d28d9' },
+                    bgcolor: colors.primary[500],
+                    '&:hover': { bgcolor: colors.primary[600] },
                     py: 1.5
                   }}
                 >
@@ -251,7 +252,7 @@ export default function ProductDetailPage() {
                   }}
                 >
                   {isWishlisted ? (
-                    <FavoriteIcon sx={{ color: '#ef4444' }} />
+                    <FavoriteIcon sx={{ color: colors.error[500] }} />
                   ) : (
                     <FavoriteBorderIcon />
                   )}
@@ -260,7 +261,7 @@ export default function ProductDetailPage() {
 
               {/* Product Description */}
               <Paper sx={{ p: 3, borderRadius: 2, bgcolor: '#f8fafc' }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
                   Product Details
                 </Typography>
                 <Typography variant="body2" sx={{ lineHeight: 1.6, color: '#4b5563' }}>

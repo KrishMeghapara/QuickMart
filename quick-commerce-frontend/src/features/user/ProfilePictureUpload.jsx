@@ -20,7 +20,7 @@ import {
   Edit as EditIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import apiService from '../services/apiService';
+import apiService from '../../services/apiService';
 
 const ProfilePictureUpload = ({ user, onProfileUpdate }) => {
   const [isUploading, setIsUploading] = useState(false);

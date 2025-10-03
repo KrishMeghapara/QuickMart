@@ -144,8 +144,36 @@ export default function ProductCarousel({ products, categoryName, onAddToCart, o
                     variant="contained"
                     size="small"
                     className="add-btn"
-                    onClick={() => onAddToCart(prod)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddToCart(prod);
+                    }}
                     disabled={!prod.isInStock}
+                    sx={{
+                      bgcolor: '#2563eb',
+                      color: 'white',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      px: 2,
+                      py: 1,
+                      minWidth: '80px',
+                      transition: 'transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease',
+                      willChange: 'transform',
+                      '&:hover': {
+                        bgcolor: '#1d4ed8',
+                        transform: 'scale(1.05)',
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                      },
+                      '&:active': {
+                        transform: 'scale(1.02)'
+                      },
+                      '&:disabled': {
+                        bgcolor: '#cbd5e1',
+                        color: '#94a3b8',
+                        transform: 'none'
+                      }
+                    }}
                   >
                     ADD
                   </Button>

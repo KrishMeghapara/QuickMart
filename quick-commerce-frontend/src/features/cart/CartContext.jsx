@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from "react";
-import { useAuth } from "./AuthContext";
-import apiService from "../services/apiService";
+import { useAuth } from "../auth/AuthContext";
+import apiService from "../../services/apiService";
 
 const CartContext = createContext();
 

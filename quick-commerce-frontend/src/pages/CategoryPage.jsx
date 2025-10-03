@@ -26,10 +26,11 @@ import {
   Home as HomeIcon,
   Category as CategoryIcon
 } from '@mui/icons-material';
-import ProductGrid from './ProductGrid';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from './CartContext';
+import ProductGrid from '../features/products/ProductGrid';
+import { useCart } from '../features/cart/CartContext';
 import apiService from '../services/apiService';
+import { colors } from '../theme/designTokens';
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
@@ -118,7 +119,7 @@ export default function CategoryPage() {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h3" sx={{ 
-            fontWeight: 700, 
+            fontWeight: 600, 
             mb: 1,
             color: '#111827'
           }}>
@@ -154,7 +155,7 @@ export default function CategoryPage() {
                 valueLabelDisplay="auto"
                 min={0}
                 max={1000}
-                sx={{ color: '#7c3aed' }}
+                sx={{ color: colors.primary[500] }}
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                 <Typography variant="caption" color="text.secondary">₹{priceRange[0]}</Typography>
@@ -170,7 +171,7 @@ export default function CategoryPage() {
                 <Switch
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#7c3aed' } }}
+                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary[500] } }}
                 />
               }
               label="In Stock Only"
@@ -199,8 +200,8 @@ export default function CategoryPage() {
                   onClick={() => setShowFilters(!showFilters)}
                   sx={{ 
                     display: { md: 'none' },
-                    borderColor: '#7c3aed',
-                    color: '#7c3aed'
+                    borderColor: colors.primary[500],
+                    color: colors.primary[500]
                   }}
                 >
                   Filters
@@ -240,9 +241,9 @@ export default function CategoryPage() {
                     variant={viewMode === 'grid' ? 'contained' : 'outlined'}
                     onClick={() => setViewMode('grid')}
                     sx={{ 
-                      backgroundColor: viewMode === 'grid' ? '#7c3aed' : 'transparent',
-                      borderColor: '#7c3aed',
-                      color: viewMode === 'grid' ? 'white' : '#7c3aed'
+                      backgroundColor: viewMode === 'grid' ? colors.primary[500] : 'transparent',
+                      borderColor: colors.primary[500],
+                      color: viewMode === 'grid' ? 'white' : colors.primary[500]
                     }}
                   >
                     <GridIcon />
@@ -251,9 +252,9 @@ export default function CategoryPage() {
                     variant={viewMode === 'compact' ? 'contained' : 'outlined'}
                     onClick={() => setViewMode('compact')}
                     sx={{ 
-                      backgroundColor: viewMode === 'compact' ? '#7c3aed' : 'transparent',
-                      borderColor: '#7c3aed',
-                      color: viewMode === 'compact' ? 'white' : '#7c3aed'
+                      backgroundColor: viewMode === 'compact' ? colors.primary[500] : 'transparent',
+                      borderColor: colors.primary[500],
+                      color: viewMode === 'compact' ? 'white' : colors.primary[500]
                     }}
                   >
                     <CompactIcon />
@@ -262,9 +263,9 @@ export default function CategoryPage() {
                     variant={viewMode === 'list' ? 'contained' : 'outlined'}
                     onClick={() => setViewMode('list')}
                     sx={{ 
-                      backgroundColor: viewMode === 'list' ? '#7c3aed' : 'transparent',
-                      borderColor: '#7c3aed',
-                      color: viewMode === 'list' ? 'white' : '#7c3aed'
+                      backgroundColor: viewMode === 'list' ? colors.primary[500] : 'transparent',
+                      borderColor: colors.primary[500],
+                      color: viewMode === 'list' ? 'white' : colors.primary[500]
                     }}
                   >
                     <ListIcon />

@@ -16,8 +16,8 @@ import {
   Avatar
 } from '@mui/material';
 import { Payment as PaymentIcon, CheckCircle as CheckIcon } from '@mui/icons-material';
-import { useCart } from './CartContext';
-import { useAuth } from './AuthContext';
+import { useCart } from '../features/cart/CartContext';
+import { useAuth } from '../features/auth/AuthContext';
 import apiService from '../services/apiService';
 
 export default function SimpleCheckout({ onClose, onSuccess }) {

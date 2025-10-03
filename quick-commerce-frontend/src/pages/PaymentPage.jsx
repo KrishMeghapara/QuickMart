@@ -42,8 +42,8 @@ import {
   ShoppingCart as CartIcon,
   LocationOn as LocationIcon
 } from '@mui/icons-material';
-import { useCart } from './CartContext';
-import { useAuth } from './AuthContext';
+import { useCart } from '../features/cart/CartContext';
+import { useAuth } from '../features/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/apiService';
 import './PaymentPage.css';

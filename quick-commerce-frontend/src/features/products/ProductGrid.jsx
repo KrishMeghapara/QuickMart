@@ -22,6 +22,7 @@ import {
   Visibility as ViewIcon,
   Star as StarIcon
 } from '@mui/icons-material';
+import { colors, shadows, transitions } from '../../theme/designTokens';
 
 export default function ProductGrid({ 
   products = [], 
@@ -114,13 +115,14 @@ export default function ProductGrid({
                 display: 'flex',
                 flexDirection: 'column',
                 borderRadius: { xs: 2, sm: 3 },
-                border: '1px solid #e5e7eb',
-                transition: 'all 0.3s ease',
+                border: `1px solid ${colors.gray[200]}`,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor: 'pointer',
                 '&:hover': {
-                  transform: { xs: 'none', sm: 'translateY(-4px)' },
+                  transform: { xs: 'none', sm: 'translateY(-8px)' },
                   boxShadow: { xs: '0 4px 12px rgba(0,0,0,0.1)', sm: '0 12px 40px rgba(0,0,0,0.15)' },
-                  borderColor: '#7c3aed',
+                  borderColor: '#2563eb',
+                  borderTop: '2px solid #2563eb'
                 }
               }}
               onMouseEnter={() => setHoveredProduct(product.productID)}
@@ -140,8 +142,8 @@ export default function ProductGrid({
                     }}
                     sx={{
                       objectFit: 'cover',
-                      transition: 'transform 0.3s ease',
-                      transform: hoveredProduct === product.productID ? 'scale(1.05)' : 'scale(1)',
+                      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transform: hoveredProduct === product.productID ? 'scale(1.08)' : 'scale(1)',
                     }}
                   />
                 ) : null}
@@ -182,9 +184,9 @@ export default function ProductGrid({
                         position: 'absolute',
                         bottom: 8,
                         right: 8,
-                        backgroundColor: 'rgba(124, 58, 237, 0.9)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.9)',
                         color: 'white',
-                        '&:hover': { backgroundColor: '#7c3aed' }
+                        '&:hover': { backgroundColor: '#2563eb' }
                       }}
                     >
                       <ViewIcon />
@@ -266,12 +268,13 @@ export default function ProductGrid({
                         width: 40,
                         height: 40,
                         borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+                        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #6d28d9, #5b21b6)',
-                          transform: 'scale(1.05)',
-                          boxShadow: '0 6px 16px rgba(124, 58, 237, 0.4)',
+                          background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 6px 16px rgba(37, 99, 235, 0.4)',
                         },
                         '&:disabled': {
                           background: '#d1d5db',
