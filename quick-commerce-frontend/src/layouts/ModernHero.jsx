@@ -41,17 +41,27 @@ export default function ModernHero() {
               mb: 2,
               textShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}>
-              Smart, Secure Shopping
+              ⚡ Quick Commerce
             </Typography>
             <Typography sx={{ 
-              fontSize: '1.25rem',
+              fontSize: '1.4rem',
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.95)',
+              maxWidth: '500px',
+              lineHeight: 1.4,
+              mb: 2
+            }}>
+              Groceries delivered in 12 minutes
+            </Typography>
+            <Typography sx={{ 
+              fontSize: '1.1rem',
               fontWeight: 400,
-              color: 'rgba(255,255,255,0.9)',
+              color: 'rgba(255,255,255,0.8)',
               maxWidth: '500px',
               lineHeight: 1.6,
               mb: 4
             }}>
-              Discover quality products delivered to your doorstep in minutes
+              Fresh groceries, daily essentials & more delivered to your doorstep in minutes
             </Typography>
             <Stack 
               direction={{ xs: 'column', sm: 'row' }} 
@@ -107,10 +117,10 @@ export default function ModernHero() {
             </Stack>
             <Grid container spacing={2}>
               {[
-                { emoji: '🚀', title: '12 Min Delivery', desc: 'Lightning fast delivery' },
-                { emoji: '⭐', title: 'Quality Assured', desc: 'Premium quality products' },
-                { emoji: '🔒', title: 'Secure Payment', desc: '100% protected payments' },
-                { emoji: '🔄', title: 'Easy Returns', desc: 'Hassle-free returns' }
+                { emoji: '⚡', title: '12 Min Delivery', desc: 'Fastest in the city' },
+                { emoji: '🥬', title: 'Fresh Produce', desc: 'Farm to your door' },
+                { emoji: '🏪', title: '10,000+ Products', desc: 'Everything you need' },
+                { emoji: '📍', title: 'Hyperlocal', desc: 'Serving your area' }
               ].map((feature, idx) => (
                 <Grid item xs={6} key={idx}>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>

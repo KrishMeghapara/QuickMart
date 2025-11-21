@@ -115,97 +115,77 @@ const LoginForm = ({ onLogin }) => {
   return (
     <Box sx={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #f5f3ff, #eef2ff)',
+      background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
       display: 'flex',
       alignItems: 'center',
       py: 4
     }}>
     <Container maxWidth="lg">
       <Grid container spacing={4} alignItems="center">
-        {/* Left Side - Brand & Features */}
+        {/* Left Side - Quick Commerce Brand */}
         <Grid item xs={12} md={6}>
           <Fade in={true} timeout={800}>
             <Box sx={{ textAlign: { xs: 'center', md: 'left' }, mb: { xs: 4, md: 0 } }}>
               {/* Brand Section */}
               <Box sx={{ mb: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 2 }}>
-                  <Avatar sx={{ 
-                    bgcolor: 'primary.main', 
-                    width: 56, 
-                    height: 56, 
-                    mr: 2,
-                    boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)'
-                  }}>
-                    <StorefrontIcon sx={{ fontSize: 28 }} />
-                  </Avatar>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 3 }}>
+                  <Box sx={{ fontSize: '3rem', mr: 2 }}>⚡</Box>
                   <Typography sx={{ 
                     fontFamily: 'Poppins, sans-serif',
                     fontWeight: 700,
                     fontSize: '2.5rem',
-                    background: 'linear-gradient(45deg, #2563eb 0%, #1d4ed8 100%)',
+                    background: 'linear-gradient(45deg, #10b981 0%, #059669 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                   }}>
-                    QuickCommerce
+                    QuickMart
                   </Typography>
                 </Box>
-                <Typography variant="h5" sx={{ mb: 1, color: '#1e293b', fontSize: '1.5rem', fontWeight: 600 }}>
-                  Welcome back!
+                <Typography variant="h4" sx={{ mb: 2, color: '#111827', fontSize: '2rem', fontWeight: 700 }}>
+                  Groceries in 12 minutes
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#64748b' }}>
-                  Sign in to your account to continue shopping
+                <Typography variant="h6" sx={{ color: '#6b7280', fontWeight: 400, mb: 3 }}>
+                  Sign in to get fresh groceries delivered to your doorstep
                 </Typography>
               </Box>
 
-              {/* Features */}
+              {/* Quick Commerce Features */}
               <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  Why choose QuickCommerce?
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {[
-                    { icon: <ShoppingCart />, text: 'Fast & secure checkout', color: '#7C3AED' },
-                    { icon: <LocalShipping />, text: 'Free delivery on orders over $50', color: '#7C3AED' },
-                    { icon: <Security />, text: '100% secure payment processing', color: '#7C3AED' },
-                    { icon: <Redeem />, text: 'Exclusive member rewards', color: '#7C3AED' }
+                    { icon: '⚡', text: '12-minute delivery', subtext: 'Lightning fast to your door', color: '#10b981' },
+                    { icon: '🥬', text: 'Fresh groceries', subtext: 'Farm to your home', color: '#10b981' },
+                    { icon: '📍', text: 'Hyperlocal', subtext: 'Serving your area', color: '#10b981' },
+                    { icon: '🔒', text: 'Secure payments', subtext: '100% safe & protected', color: '#10b981' }
                   ].map((feature, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 0.5 }}>
-                      <Avatar sx={{ 
-                        bgcolor: '#E0E7FF',
-                        color: feature.color,
-                        width: 40, 
-                        height: 40
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
+                      <Box sx={{ 
+                        fontSize: '2rem',
+                        width: 48,
+                        height: 48,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                        borderRadius: 2
                       }}>
                         {feature.icon}
-                      </Avatar>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {feature.text}
-                      </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#111827' }}>
+                          {feature.text}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                          {feature.subtext}
+                        </Typography>
+                      </Box>
                     </Box>
                   ))}
                 </Box>
               </Box>
 
-              {/* Testimonials */}
-              <Box sx={{ 
-                bgcolor: 'rgba(37, 99, 235, 0.05)', 
-                borderRadius: 3, 
-                p: 3, 
-                border: '1px solid rgba(37, 99, 235, 0.1)'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} sx={{ color: '#fbbf24', fontSize: 20 }} />
-                  ))}
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mb: 1 }}>
-                  "Amazing shopping experience! Fast delivery and great customer service."
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  - Sarah M., Verified Customer
-                </Typography>
-              </Box>
+
             </Box>
           </Fade>
         </Grid>
@@ -312,24 +292,26 @@ const LoginForm = ({ onLogin }) => {
                     variant="contained"
                     disabled={loading}
                     sx={{
-                      py: 1.5,
+                      py: 2,
                       mb: 3,
                       borderRadius: 2,
-                      background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
+                      fontSize: '1rem',
+                      fontWeight: 600,
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+                        background: 'linear-gradient(135deg, #059669, #047857)',
                         transform: 'translateY(-1px)',
-                        boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)'
+                        boxShadow: '0 6px 20px rgba(16, 185, 129, 0.4)'
                       },
                       '&:disabled': {
-                        background: 'linear-gradient(45deg, #cbd5e0 0%, #a0aec0 100%)',
+                        background: '#cbd5e0',
                         transform: 'none'
                       }
                     }}
                     startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
                   >
-                    {loading ? 'Signing In...' : 'Sign In'}
+                    {loading ? 'Signing In...' : 'Sign In & Start Shopping'}
                   </Button>
                 </Box>
 
@@ -350,20 +332,20 @@ const LoginForm = ({ onLogin }) => {
 
                 {/* Footer */}
                 <Box sx={{ textAlign: 'center', mt: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: '#6b7280' }}>
                     Don't have an account?{' '}
                     <Button 
                       variant="text" 
                       onClick={() => window.location.href = '/register'}
                       sx={{ 
-                        background: 'linear-gradient(135deg, #7C3AED, #4C1D95)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
+                        color: '#10b981',
                         fontWeight: 600,
                         textTransform: 'none',
+                        p: 0,
+                        minWidth: 'auto',
                         '&:hover': {
-                          background: 'rgba(124, 58, 237, 0.1)'
+                          bgcolor: 'rgba(16, 185, 129, 0.1)',
+                          color: '#059669'
                         }
                       }}
                     >

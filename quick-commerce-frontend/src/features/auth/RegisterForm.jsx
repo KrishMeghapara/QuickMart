@@ -190,106 +190,75 @@ const RegisterForm = ({ onRegister }) => {
   const passwordStrength = getPasswordStrength(password);
 
   return (
-    <Container maxWidth="lg" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', py: 4 }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+      display: 'flex',
+      alignItems: 'center',
+      py: 4
+    }}>
+    <Container maxWidth="lg">
       <Grid container spacing={4} alignItems="center">
-        {/* Left Side - Brand & Features */}
+        {/* Left Side - Quick Commerce Brand */}
         <Grid item xs={12} md={6}>
           <Fade in={true} timeout={800}>
             <Box sx={{ textAlign: { xs: 'center', md: 'left' }, mb: { xs: 4, md: 0 } }}>
               {/* Brand Section */}
               <Box sx={{ mb: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 2 }}>
-                  <Avatar sx={{ 
-                    bgcolor: 'primary.main', 
-                    width: 56, 
-                    height: 56, 
-                    mr: 2,
-                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
-                  }}>
-                    <StorefrontIcon sx={{ fontSize: 28 }} />
-                  </Avatar>
-                  <Typography variant="h3" sx={{ 
-                    fontWeight: 700, 
-                    background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 3 }}>
+                  <Box sx={{ fontSize: '3rem', mr: 2 }}>⚡</Box>
+                  <Typography sx={{ 
+                    fontFamily: 'Poppins, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '2.5rem',
+                    background: 'linear-gradient(45deg, #10b981 0%, #059669 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                   }}>
-                    QuickCommerce
+                    QuickMart
                   </Typography>
                 </Box>
-                <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
-                  Join our community!
+                <Typography variant="h4" sx={{ mb: 2, color: '#111827', fontSize: '2rem', fontWeight: 700 }}>
+                  Start getting groceries in 12 minutes
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Create your account and start shopping with exclusive benefits
+                <Typography variant="h6" sx={{ color: '#6b7280', fontWeight: 400, mb: 3 }}>
+                  Create your account and experience the fastest grocery delivery
                 </Typography>
               </Box>
 
-              {/* Features */}
+              {/* Quick Commerce Features */}
               <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  Member benefits you'll love:
-                </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {[
-                    { icon: <CheckCircleIcon />, text: 'Exclusive member discounts', color: '#10b981' },
-                    { icon: <LocalShipping />, text: 'Free delivery on all orders', color: '#3b82f6' },
-                    { icon: <Redeem />, text: 'Early access to sales', color: '#f59e0b' },
-                    { icon: <Security />, text: 'Secure shopping experience', color: '#8b5cf6' }
+                    { icon: '⚡', text: '12-minute delivery', subtext: 'Lightning fast to your door' },
+                    { icon: '🥬', text: 'Fresh groceries', subtext: 'Farm to your home' },
+                    { icon: '💰', text: 'Best prices', subtext: 'Save on every order' },
+                    { icon: '🎁', text: 'Welcome offer', subtext: 'Get ₹100 off on first order' }
                   ].map((feature, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar sx={{ 
-                        bgcolor: feature.color, 
-                        width: 40, 
-                        height: 40,
-                        boxShadow: `0 2px 8px ${feature.color}40`
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
+                      <Box sx={{ 
+                        fontSize: '2rem',
+                        width: 48,
+                        height: 48,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                        borderRadius: 2
                       }}>
                         {feature.icon}
-                      </Avatar>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {feature.text}
-                      </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#111827' }}>
+                          {feature.text}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                          {feature.subtext}
+                        </Typography>
+                      </Box>
                     </Box>
                   ))}
-                </Box>
-              </Box>
-
-              {/* Stats */}
-              <Box sx={{ 
-                bgcolor: 'rgba(102, 126, 234, 0.05)', 
-                borderRadius: 3, 
-                p: 3, 
-                border: '1px solid rgba(102, 126, 234, 0.1)'
-              }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  Join thousands of happy customers
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                      50K+
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Happy Customers
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                      1M+
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Products Sold
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} sx={{ color: '#fbbf24', fontSize: 20 }} />
-                  ))}
-                  <Typography variant="body2" sx={{ ml: 1, fontWeight: 600 }}>
-                    4.9/5 Rating
-                  </Typography>
                 </Box>
               </Box>
             </Box>
@@ -302,19 +271,18 @@ const RegisterForm = ({ onRegister }) => {
             <Card sx={{ 
               maxWidth: 480, 
               mx: 'auto',
-              borderRadius: 4,
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
-              backdropFilter: 'blur(10px)'
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              border: '1px solid #f1f5f9',
+              background: 'white'
             }}>
-              <CardContent sx={{ p: 4 }}>
+              <CardContent sx={{ p: 5 }}>
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: '#1e293b' }}>
                     Create Account
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    Join QuickCommerce and start shopping today
+                  <Typography variant="body1" sx={{ color: '#64748b' }}>
+                    Join QuickMart and get groceries in 12 minutes
                   </Typography>
                 </Box>
 
@@ -338,7 +306,18 @@ const RegisterForm = ({ onRegister }) => {
                     onChange={handleUserNameChange}
                     error={!!userNameError}
                     helperText={userNameError}
-                    sx={{ mb: 3 }}
+                    sx={{ 
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#10b981',
+                          boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -356,7 +335,18 @@ const RegisterForm = ({ onRegister }) => {
                     onChange={handleEmailChange}
                     error={!!emailError}
                     helperText={emailError}
-                    sx={{ mb: 3 }}
+                    sx={{ 
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#10b981',
+                          boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -374,7 +364,18 @@ const RegisterForm = ({ onRegister }) => {
                     onChange={handlePasswordChange}
                     error={!!passwordError}
                     helperText={passwordError}
-                    sx={{ mb: 2 }}
+                    sx={{ 
+                      mb: 2,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#10b981',
+                          boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -428,7 +429,18 @@ const RegisterForm = ({ onRegister }) => {
                     onChange={handleConfirmPasswordChange}
                     error={!!confirmPasswordError}
                     helperText={confirmPasswordError}
-                    sx={{ mb: 3 }}
+                    sx={{ 
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#94a3b8'
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#10b981',
+                          boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.1)'
+                        }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -458,17 +470,23 @@ const RegisterForm = ({ onRegister }) => {
                     sx={{
                       mt: 3,
                       mb: 2,
-                      py: 1.5,
-                      background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                      py: 2,
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      borderRadius: 2,
                       '&:hover': {
-                        background: 'linear-gradient(45deg, #5a6fd8 0%, #6a4190 100%)',
+                        background: 'linear-gradient(135deg, #059669, #047857)',
                         transform: 'translateY(-1px)',
-                        boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)'
+                        boxShadow: '0 6px 20px rgba(16, 185, 129, 0.4)'
                       },
-                      transition: 'all 0.3s ease'
+                      '&:disabled': {
+                        background: '#cbd5e0'
+                      },
+                      transition: 'all 0.2s ease'
                     }}
                   >
-                    {loading ? 'Creating Account...' : 'Create Account'}
+                    {loading ? 'Creating Account...' : 'Create Account & Start Shopping'}
                   </Button>
 
                   {/* Divider */}
@@ -488,17 +506,20 @@ const RegisterForm = ({ onRegister }) => {
 
                   {/* Footer */}
                   <Box sx={{ textAlign: 'center', mt: 3 }}>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#6b7280' }}>
                       Already have an account?{' '}
                       <Button 
                         variant="text" 
                         onClick={() => window.location.href = '/login'}
                         sx={{ 
-                          color: 'primary.main', 
+                          color: '#10b981',
                           fontWeight: 600,
                           textTransform: 'none',
+                          p: 0,
+                          minWidth: 'auto',
                           '&:hover': {
-                            background: 'rgba(102, 126, 234, 0.1)'
+                            bgcolor: 'rgba(16, 185, 129, 0.1)',
+                            color: '#059669'
                           }
                         }}
                       >
@@ -513,6 +534,7 @@ const RegisterForm = ({ onRegister }) => {
         </Grid>
       </Grid>
     </Container>
+    </Box>
   );
 };
 

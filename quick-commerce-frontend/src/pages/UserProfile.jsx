@@ -63,9 +63,10 @@ const API_BASE_URL = 'http://localhost:5236/api';
 export default function UserProfile() {
   const { user, token, updateUser } = useAuth();
   const { cart } = useCart();
-  const [address, setAddress] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [defaultAddressId, setDefaultAddressId] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -74,10 +75,12 @@ export default function UserProfile() {
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
   const [formData, setFormData] = useState({
     house: '',
@@ -86,7 +89,9 @@ export default function UserProfile() {
     city: '',
     state: '',
     pincode: '',
-    phone: ''
+    phone: '',
+    addressType: 'Home',
+    label: ''
   });
 
   // Fetch user's data on component mount
@@ -146,25 +151,36 @@ export default function UserProfile() {
 
       if (response.ok) {
         const addressData = await response.json();
-        console.log('Fetched address data:', addressData); // Debug log
-        setAddress(addressData);
-        setFormData({
-          house: addressData.house || '',
-          street: addressData.street || '',
-          landmark: addressData.landmark || '',
-          city: addressData.city || '',
-          state: addressData.state || '',
-          pincode: addressData.pincode || '',
-          phone: addressData.phone || ''
-        });
+        console.log('Fetched address data:', addressData);
+        
+        // Handle single address (convert to array for consistency)
+        if (addressData && !Array.isArray(addressData)) {
+          const addressArray = [{
+            ...addressData,
+            addressType: addressData.addressType || 'Home',
+            label: addressData.label || 'Primary Address',
+            isDefault: true
+          }];
+          setAddresses(addressArray);
+          setDefaultAddressId(addressData.AddressID || addressData.addressID);
+        } else if (Array.isArray(addressData)) {
+          setAddresses(addressData);
+          const defaultAddr = addressData.find(addr => addr.isDefault);
+          if (defaultAddr) {
+            setDefaultAddressId(defaultAddr.AddressID || defaultAddr.addressID);
+          }
+        } else {
+          setAddresses([]);
+        }
       } else if (response.status === 404) {
-        setAddress(null);
+        setAddresses([]);
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || 'Failed to fetch address');
       }
     } catch (error) {
       console.error('Error fetching address:', error);
+      setAddresses([]);
       throw error;
     }
   };
@@ -299,7 +315,73 @@ export default function UserProfile() {
     }
   };
 
-  const handleDeleteAddress = () => {
+  const handleSetDefaultAddress = async (addressId) => {
+    try {
+      setIsSaving(true);
+      // API call to set default address
+      // For now, just update locally
+      setDefaultAddressId(addressId);
+      setSuccess('Default address updated!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      setError('Failed to set default address');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      setUseCurrentLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            // Use reverse geocoding to get address from coordinates
+            const { latitude, longitude } = position.coords;
+            
+            // For demo purposes, set approximate location
+            setFormData(prev => ({
+              ...prev,
+              city: 'Rajkot',
+              state: 'Gujarat',
+              pincode: '360001'
+            }));
+            
+            setSuccess('Location detected! Please complete the address details.');
+            setTimeout(() => setSuccess(''), 3000);
+          } catch (error) {
+            setError('Failed to get address from location');
+          } finally {
+            setUseCurrentLocation(false);
+          }
+        },
+        (error) => {
+          setError('Failed to get your location. Please enter manually.');
+          setUseCurrentLocation(false);
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by your browser');
+    }
+  };
+
+  const handleEditAddress = (address) => {
+    setEditingAddressId(address.AddressID || address.addressID);
+    setFormData({
+      house: address.house || '',
+      street: address.street || '',
+      landmark: address.landmark || '',
+      city: address.city || '',
+      state: address.state || '',
+      pincode: address.pincode || '',
+      phone: address.phone || '',
+      addressType: address.addressType || 'Home',
+      label: address.label || ''
+    });
+  };
+
+  const handleDeleteAddress = (address) => {
+    setAddressToDelete(address);
     setShowDeleteDialog(true);
   };
 
@@ -308,45 +390,24 @@ export default function UserProfile() {
       setIsSaving(true);
       setError('');
       
-      console.log('Address object:', address); // Debug log
-      
-      const addressId = address?.AddressID || address?.addressID || address?.id;
+      const addressId = addressToDelete?.AddressID || addressToDelete?.addressID || addressToDelete?.id;
       if (!addressId) {
-        // Fallback: try to get address ID from current user
-        const response = await fetch(`${API_BASE_URL}/Address/GetForCurrentUser`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const addressData = await response.json();
-          const fallbackId = addressData?.AddressID || addressData?.addressID || addressData?.id;
-          if (fallbackId) {
-            await apiService.deleteAddress(fallbackId);
-          } else {
-            throw new Error('Could not find address ID');
-          }
-        } else {
-          throw new Error('Address not found');
-        }
-      } else {
-        await apiService.deleteAddress(addressId);
+        throw new Error('Could not find address ID');
       }
       
+      await apiService.deleteAddress(addressId);
+      
       setSuccess('Address deleted successfully!');
-      setAddress(null);
-      setFormData({
-        house: '',
-        street: '',
-        landmark: '',
-        city: '',
-        state: '',
-        pincode: '',
-        phone: ''
-      });
+      setAddresses(prev => prev.filter(addr => 
+        (addr.AddressID || addr.addressID) !== addressId
+      ));
+      
+      if (defaultAddressId === addressId) {
+        setDefaultAddressId(null);
+      }
+      
       setShowDeleteDialog(false);
+      setAddressToDelete(null);
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Delete address error:', error);
@@ -425,21 +486,34 @@ export default function UserProfile() {
     }}>
       {/* Header */}
       <Box sx={{ mb: { xs: 3, md: 4 } }}>
-        <Typography sx={{ 
-          fontSize: { xs: '2.25rem', md: '3.5rem' },
-          fontWeight: 800, 
-          mb: 1,
-          background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          letterSpacing: '-0.5px',
-          lineHeight: 1
-        }}>
-          My Profile
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+          <Typography sx={{ 
+            fontSize: { xs: '2.25rem', md: '3.5rem' },
+            fontWeight: 800, 
+            background: 'linear-gradient(45deg, #10b981 0%, #059669 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '-0.5px',
+            lineHeight: 1
+          }}>
+            My Profile
+          </Typography>
+          <Chip
+            label="⚡ Quick Commerce"
+            size="small"
+            sx={{
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              height: '24px',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+            }}
+          />
+        </Box>
         <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem', mb: 0 }}>
-          Manage your account settings and preferences
+          Manage your account and get groceries in 12 minutes
         </Typography>
       </Box>
 
@@ -479,15 +553,15 @@ export default function UserProfile() {
                 {/* Profile Picture */}
                 <Box sx={{ position: 'relative', display: 'inline-block', mb: 3, mt: 2 }}>
                   <Box sx={{
-                    background: 'var(--brand-gradient)',
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
                     borderRadius: '50%',
                     padding: '8px',
                     display: 'inline-block',
-                    boxShadow: 'var(--glow-purple)',
+                    boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)',
                     transition: 'transform 0.18s ease, box-shadow 0.18s ease',
                     '&:hover': {
                       transform: 'translateY(-4px) scale(1.02)',
-                      boxShadow: 'var(--glow-purple-intense)'
+                      boxShadow: '0 12px 35px rgba(16, 185, 129, 0.4)'
                     }
                   }}>
                     {(user?.profilePicture || user?.googlePicture) ? (
@@ -577,11 +651,11 @@ export default function UserProfile() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, gap: 3 }}>
                   <Box sx={{ textAlign: 'center' }}>
                     <Box sx={{ mb: 1 }}>
-                      <OrderIcon sx={{ fontSize: 24, color: 'var(--brand)', mb: 0.5 }} />
+                      <OrderIcon sx={{ fontSize: 24, color: orders.length > 0 ? '#10b981' : 'var(--muted)', mb: 0.5 }} />
                     </Box>
                     <Typography variant="h6" sx={{ 
                       fontWeight: 700, 
-                      color: orders.length > 0 ? 'var(--brand)' : 'var(--muted)', 
+                      color: orders.length > 0 ? '#10b981' : 'var(--muted)', 
                       fontSize: '1.2rem' 
                     }}>
                       {orders.length}
@@ -592,11 +666,11 @@ export default function UserProfile() {
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Box sx={{ mb: 1 }}>
-                      <ShoppingBagIcon sx={{ fontSize: 24, color: cart.length > 0 ? 'var(--accent)' : 'var(--muted)', mb: 0.5 }} />
+                      <ShoppingBagIcon sx={{ fontSize: 24, color: cart.length > 0 ? '#f59e0b' : 'var(--muted)', mb: 0.5 }} />
                     </Box>
                     <Typography variant="h6" sx={{ 
                       fontWeight: 700, 
-                      color: cart.length > 0 ? 'var(--accent)' : 'var(--muted)', 
+                      color: cart.length > 0 ? '#f59e0b' : 'var(--muted)', 
                       fontSize: '1.2rem' 
                     }}>
                       {cart.length}
@@ -607,17 +681,17 @@ export default function UserProfile() {
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Box sx={{ mb: 1 }}>
-                      <LocationIcon sx={{ fontSize: 24, color: address ? 'var(--success)' : 'var(--muted)', mb: 0.5 }} />
+                      <LocationIcon sx={{ fontSize: 24, color: addresses.length > 0 ? '#10b981' : 'var(--muted)', mb: 0.5 }} />
                     </Box>
                     <Typography variant="h6" sx={{ 
                       fontWeight: 700, 
-                      color: address ? 'var(--success)' : 'var(--muted)', 
+                      color: addresses.length > 0 ? '#10b981' : 'var(--muted)', 
                       fontSize: '1.2rem' 
                     }}>
-                      {address ? '1' : '0'}
+                      {addresses.length}
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'var(--muted)', fontSize: '0.75rem' }}>
-                      Address
+                      {addresses.length === 1 ? 'Address' : 'Addresses'}
                     </Typography>
                   </Box>
                 </Box>
@@ -640,10 +714,10 @@ export default function UserProfile() {
                         fontWeight: 600,
                         transition: 'all 0.3s ease',
                         '&:hover': {
-                          background: 'var(--accent)',
+                          background: 'linear-gradient(135deg, #10b981, #059669)',
                           color: 'white',
                           transform: 'translateY(-2px)',
-                          boxShadow: 'var(--glow-cyan)'
+                          boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)'
                         }
                       }}
                     >
@@ -664,10 +738,10 @@ export default function UserProfile() {
                       fontWeight: 600,
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        background: 'var(--accent)',
+                        background: 'linear-gradient(135deg, #10b981, #059669)',
                         color: 'white',
                         transform: 'translateY(-2px)',
-                        boxShadow: 'var(--glow-cyan)'
+                        boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)'
                       }
                     }}
                   >
@@ -687,10 +761,10 @@ export default function UserProfile() {
                       fontWeight: 600,
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        background: 'var(--accent)',
+                        background: 'linear-gradient(135deg, #10b981, #059669)',
                         color: 'white',
                         transform: 'translateY(-2px)',
-                        boxShadow: 'var(--glow-cyan)'
+                        boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)'
                       }
                     }}
                   >
@@ -739,9 +813,9 @@ export default function UserProfile() {
                             boxShadow: '0 0 0 6px rgba(124, 58, 237, 0.06)'
                           },
                           ...(activeTab === tab.id ? {
-                            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
                             color: '#fff',
-                            boxShadow: '0 6px 20px rgba(124, 58, 237, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                            boxShadow: '0 6px 20px rgba(16, 185, 129, 0.25), 0 2px 8px rgba(0, 0, 0, 0.06)',
                             transform: 'translateY(-3px)'
                           } : {
                             background: 'rgba(241, 245, 249, 0.92)',
@@ -822,7 +896,7 @@ export default function UserProfile() {
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h5" sx={{ fontWeight: 700, color: '#111827' }}>
-                          Shipping Address
+                          Delivery Addresses
                         </Typography>
                         <Button
                           variant="contained"
@@ -830,240 +904,362 @@ export default function UserProfile() {
                           onClick={() => setShowAddressDialog(true)}
                           sx={{ 
                             borderRadius: 3,
-                            background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                            textTransform: 'none',
+                            fontWeight: 600,
                             '&:hover': {
-                              background: 'linear-gradient(135deg, #5a67d8, #6b46c1)',
-                              boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)'
+                              background: 'linear-gradient(135deg, #059669, #047857)',
+                              boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
+                              transform: 'translateY(-2px)'
                             }
                           }}
                         >
-                          Add Address
+                          Add New Address
                         </Button>
                       </Box>
 
-                      {address ? (
-                        <Card sx={{ 
-                          border: '1px solid #e0e0e0', 
-                          borderRadius: 4,
-                          background: 'rgba(102, 126, 234, 0.02)',
-                          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.05)'
-                        }}>
-                          <CardContent>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                              <Box>
-                                <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-                                  {formData.house}, {formData.street}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                  {formData.landmark && `${formData.landmark}, `}
-                                  {formData.city}, {formData.state} {formData.pincode}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  Phone: {formData.phone}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button
-                                  startIcon={<EditIcon />}
-                                  onClick={() => setIsEditing(!isEditing)}
-                                  size="small"
-                                  sx={{
-                                    borderRadius: '10px',
-                                    px: 2,
-                                    py: 1,
-                                    background: 'linear-gradient(135deg, #EEF8FF, #E6F1FF)',
-                                    color: '#0ea5e9',
-                                    border: '1px solid rgba(14, 165, 233, 0.14)',
-                                    fontWeight: 700,
-                                    textTransform: 'none',
-                                    transition: 'transform 0.14s ease, box-shadow 0.14s ease',
+                      {addresses.length > 0 ? (
+                        <Grid container spacing={3}>
+                          {addresses.map((address) => {
+                            const addressId = address.AddressID || address.addressID;
+                            const isDefault = addressId === defaultAddressId;
+                            const isEditing = addressId === editingAddressId;
+                            
+                            return (
+                              <Grid item xs={12} key={addressId}>
+                                <Fade in={true} timeout={400}>
+                                  <Card sx={{ 
+                                    border: isDefault ? '2px solid #10b981' : '1px solid #e0e0e0', 
+                                    borderRadius: 4,
+                                    background: isDefault ? 'rgba(16, 185, 129, 0.03)' : 'white',
+                                    boxShadow: isDefault ? '0 4px 20px rgba(16, 185, 129, 0.15)' : '0 2px 12px rgba(0, 0, 0, 0.05)',
+                                    transition: 'all 0.3s ease',
                                     '&:hover': {
                                       transform: 'translateY(-2px)',
-                                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.06)'
+                                      boxShadow: isDefault ? '0 6px 25px rgba(16, 185, 129, 0.2)' : '0 4px 16px rgba(0, 0, 0, 0.1)'
                                     }
-                                  }}
-                                >
-                                  Change
-                                </Button>
-                                <Button
-                                  startIcon={<DeleteIcon />}
-                                  onClick={handleDeleteAddress}
-                                  size="small"
-                                  sx={{
-                                    borderRadius: '10px',
-                                    px: 2,
-                                    py: 1,
-                                    background: 'linear-gradient(135deg, #fff5f5, #fff0f0)',
-                                    color: '#ef4444',
-                                    border: '1px solid rgba(220, 38, 38, 0.12)',
-                                    fontWeight: 700,
-                                    textTransform: 'none',
-                                    transition: 'transform 0.14s ease, box-shadow 0.14s ease',
-                                    '&:hover': {
-                                      transform: 'translateY(-2px)',
-                                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.06)'
-                                    }
-                                  }}
-                                >
-                                  Remove
-                                </Button>
-                              </Box>
-                            </Box>
+                                  }}>
+                                    <CardContent sx={{ p: 3 }}>
+                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                        <Box sx={{ flex: 1 }}>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                                            <Chip
+                                              label={address.addressType || 'Home'}
+                                              size="small"
+                                              icon={address.addressType === 'Work' ? <SettingsIcon sx={{ fontSize: 14 }} /> : <LocationIcon sx={{ fontSize: 14 }} />}
+                                              sx={{
+                                                background: address.addressType === 'Work' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'linear-gradient(135deg, #10b981, #059669)',
+                                                color: 'white',
+                                                fontWeight: 600,
+                                                fontSize: '0.75rem'
+                                              }}
+                                            />
+                                            {isDefault && (
+                                              <Chip
+                                                label="Default"
+                                                size="small"
+                                                icon={<CheckIcon sx={{ fontSize: 14 }} />}
+                                                sx={{
+                                                  background: '#f59e0b',
+                                                  color: 'white',
+                                                  fontWeight: 600,
+                                                  fontSize: '0.75rem'
+                                                }}
+                                              />
+                                            )}
+                                            <Chip
+                                              label="⚡ 12 mins"
+                                              size="small"
+                                              sx={{
+                                                background: 'rgba(16, 185, 129, 0.1)',
+                                                color: '#10b981',
+                                                fontWeight: 600,
+                                                fontSize: '0.7rem',
+                                                border: '1px solid rgba(16, 185, 129, 0.2)'
+                                              }}
+                                            />
+                                          </Box>
+                                          
+                                          {!isEditing ? (
+                                            <>
+                                              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: '#111827' }}>
+                                                {address.house}, {address.street}
+                                              </Typography>
+                                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                {address.landmark && `${address.landmark}, `}
+                                                {address.city}, {address.state} {address.pincode}
+                                              </Typography>
+                                              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                📞 {address.phone}
+                                              </Typography>
+                                            </>
+                                          ) : (
+                                            <Box sx={{ mt: 2 }}>
+                                              <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="House/Flat No."
+                                                    name="house"
+                                                    value={formData.house}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="Street"
+                                                    name="street"
+                                                    value={formData.street}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="Landmark"
+                                                    name="landmark"
+                                                    value={formData.landmark}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="City"
+                                                    name="city"
+                                                    value={formData.city}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="State"
+                                                    name="state"
+                                                    value={formData.state}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="Pincode"
+                                                    name="pincode"
+                                                    value={formData.pincode}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                  <TextField
+                                                    fullWidth
+                                                    label="Phone"
+                                                    name="phone"
+                                                    value={formData.phone}
+                                                    onChange={handleInputChange}
+                                                    size="small"
+                                                  />
+                                                </Grid>
+                                              </Grid>
+                                            </Box>
+                                          )}
+                                        </Box>
+                                        
+                                        {!isEditing && (
+                                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, ml: 2 }}>
+                                            {!isDefault && (
+                                              <Button
+                                                size="small"
+                                                startIcon={<CheckIcon />}
+                                                onClick={() => handleSetDefaultAddress(addressId)}
+                                                sx={{
+                                                  borderRadius: '10px',
+                                                  px: 2,
+                                                  py: 1,
+                                                  background: 'rgba(16, 185, 129, 0.1)',
+                                                  color: '#10b981',
+                                                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                  fontWeight: 600,
+                                                  textTransform: 'none',
+                                                  fontSize: '0.8rem',
+                                                  transition: 'all 0.2s ease',
+                                                  '&:hover': {
+                                                    background: '#10b981',
+                                                    color: 'white',
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                                                  }
+                                                }}
+                                              >
+                                                Set Default
+                                              </Button>
+                                            )}
+                                            <Button
+                                              size="small"
+                                              startIcon={<EditIcon />}
+                                              onClick={() => handleEditAddress(address)}
+                                              sx={{
+                                                borderRadius: '10px',
+                                                px: 2,
+                                                py: 1,
+                                                background: 'rgba(59, 130, 246, 0.1)',
+                                                color: '#3b82f6',
+                                                border: '1px solid rgba(59, 130, 246, 0.2)',
+                                                fontWeight: 600,
+                                                textTransform: 'none',
+                                                fontSize: '0.8rem',
+                                                transition: 'all 0.2s ease',
+                                                '&:hover': {
+                                                  background: '#3b82f6',
+                                                  color: 'white',
+                                                  transform: 'translateY(-2px)',
+                                                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                                                }
+                                              }}
+                                            >
+                                              Edit
+                                            </Button>
+                                            <Button
+                                              size="small"
+                                              startIcon={<DeleteIcon />}
+                                              onClick={() => handleDeleteAddress(address)}
+                                              sx={{
+                                                borderRadius: '10px',
+                                                px: 2,
+                                                py: 1,
+                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                color: '#ef4444',
+                                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                fontWeight: 600,
+                                                textTransform: 'none',
+                                                fontSize: '0.8rem',
+                                                transition: 'all 0.2s ease',
+                                                '&:hover': {
+                                                  background: '#ef4444',
+                                                  color: 'white',
+                                                  transform: 'translateY(-2px)',
+                                                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                                                }
+                                              }}
+                                            >
+                                              Delete
+                                            </Button>
+                                          </Box>
+                                        )}
+                                      </Box>
 
-                            {isEditing && (
-                              <Box sx={{ mt: 3 }}>
-                                <Grid container spacing={2}>
-                                  <Grid item xs={12} sm={6}>
-                                    <TextField
-                                      fullWidth
-                                      label="House/Flat No."
-                                      name="house"
-                                      value={formData.house}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <TextField
-                                      fullWidth
-                                      label="Street"
-                                      name="street"
-                                      value={formData.street}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <TextField
-                                      fullWidth
-                                      label="Landmark"
-                                      name="landmark"
-                                      value={formData.landmark}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12} sm={4}>
-                                    <TextField
-                                      fullWidth
-                                      label="City"
-                                      name="city"
-                                      value={formData.city}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12} sm={4}>
-                                    <TextField
-                                      fullWidth
-                                      label="State"
-                                      name="state"
-                                      value={formData.state}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12} sm={4}>
-                                    <TextField
-                                      fullWidth
-                                      label="Pincode"
-                                      name="pincode"
-                                      value={formData.pincode}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <TextField
-                                      fullWidth
-                                      label="Phone"
-                                      name="phone"
-                                      value={formData.phone}
-                                      onChange={handleInputChange}
-                                      size="small"
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Box sx={{ display: 'flex', gap: 2 }}>
-                                      <Button
-                                        variant="contained"
-                                        onClick={handleSaveAddress}
-                                        disabled={isSaving}
-                                        startIcon={isSaving ? <CircularProgress size={16} /> : <SaveIcon />}
-                                        sx={{
-                                          background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                          borderRadius: 3,
-                                          px: 3,
-                                          py: 1.5,
-                                          boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
-                                          '&:hover': {
-                                            background: 'linear-gradient(135deg, #5a67d8, #6b46c1)',
-                                            boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)'
-                                          }
-                                        }}
-                                      >
-                                        {isSaving ? 'Saving...' : 'Save Changes'}
-                                      </Button>
-                                      <Button
-                                        variant="outlined"
-                                        onClick={() => setIsEditing(false)}
-                                      >
-                                        Cancel
-                                      </Button>
-                                    </Box>
-                                  </Grid>
-                                </Grid>
-                              </Box>
-                            )}
-                          </CardContent>
-                        </Card>
+                                      {isEditing && (
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+                                          <Button
+                                            variant="contained"
+                                            onClick={handleSaveAddress}
+                                            disabled={isSaving}
+                                            startIcon={isSaving ? <CircularProgress size={16} /> : <SaveIcon />}
+                                            sx={{
+                                              background: 'linear-gradient(135deg, #10b981, #059669)',
+                                              borderRadius: 3,
+                                              px: 3,
+                                              py: 1.5,
+                                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                                              textTransform: 'none',
+                                              fontWeight: 600,
+                                              '&:hover': {
+                                                background: 'linear-gradient(135deg, #059669, #047857)',
+                                                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)'
+                                              }
+                                            }}
+                                          >
+                                            {isSaving ? 'Saving...' : 'Save Changes'}
+                                          </Button>
+                                          <Button
+                                            variant="outlined"
+                                            onClick={() => setEditingAddressId(null)}
+                                            sx={{
+                                              borderColor: '#e5e7eb',
+                                              color: '#6b7280',
+                                              borderRadius: 3,
+                                              px: 3,
+                                              py: 1.5,
+                                              textTransform: 'none',
+                                              fontWeight: 600,
+                                              '&:hover': {
+                                                borderColor: '#d1d5db',
+                                                background: '#f9fafb'
+                                              }
+                                            }}
+                                          >
+                                            Cancel
+                                          </Button>
+                                        </Box>
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                </Fade>
+                              </Grid>
+                            );
+                          })}
+                        </Grid>
                       ) : (
                         <Box sx={{ 
                           textAlign: 'center', 
-                          py: 6,
-                          border: '2px dashed rgba(226, 232, 240, 0.9)',
-                          borderRadius: 3,
-                          background: 'linear-gradient(180deg, rgba(250, 250, 255, 0.6), rgba(255, 255, 255, 0.8))'
+                          py: 8,
+                          border: '2px dashed rgba(16, 185, 129, 0.3)',
+                          borderRadius: 4,
+                          background: 'linear-gradient(180deg, rgba(236, 253, 245, 0.6), rgba(255, 255, 255, 0.8))'
                         }}>
                           <Box sx={{
-                            width: 72,
-                            height: 72,
+                            width: 80,
+                            height: 80,
                             borderRadius: '50%',
-                            background: 'rgba(102, 126, 234, 0.08)',
+                            background: 'rgba(16, 185, 129, 0.1)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             mx: 'auto',
-                            mb: 2
+                            mb: 3,
+                            animation: 'pulse 2s infinite',
+                            '@keyframes pulse': {
+                              '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                              '50%': { transform: 'scale(1.05)', opacity: 0.8 }
+                            }
                           }}>
-                            <LocationIcon sx={{ fontSize: 32, color: '#667eea' }} />
+                            <LocationIcon sx={{ fontSize: 40, color: '#10b981' }} />
                           </Box>
-                          <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, color: '#0F172A' }}>
-                            No Address Added
+                          <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, color: '#0F172A' }}>
+                            No Delivery Address Added
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 280, mx: 'auto', lineHeight: 1.5 }}>
-                            Add your shipping address to make checkout faster and more convenient
+                          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400, mx: 'auto', lineHeight: 1.6 }}>
+                            Add your delivery address to get groceries delivered in just 12 minutes! ⚡
                           </Typography>
                           <Button
                             variant="contained"
+                            size="large"
                             startIcon={<AddIcon />}
                             onClick={() => setShowAddressDialog(true)}
                             sx={{
-                              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                              background: 'linear-gradient(135deg, #10b981, #059669)',
                               borderRadius: 3,
-                              px: 3,
-                              py: 1.5,
-                              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                              px: 4,
+                              py: 2,
+                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                               textTransform: 'none',
                               fontWeight: 600,
+                              fontSize: '1rem',
                               '&:hover': {
-                                background: 'linear-gradient(135deg, #5a67d8, #6b46c1)',
-                                boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)'
+                                background: 'linear-gradient(135deg, #059669, #047857)',
+                                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
+                                transform: 'translateY(-2px)'
                               }
                             }}
                           >
-                            Add Address
+                            Add Your First Address
                           </Button>
                         </Box>
                       )}
@@ -1126,10 +1322,14 @@ export default function UserProfile() {
                                     size="small"
                                     sx={{ 
                                       mr: 1,
-                                      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                      background: 'linear-gradient(135deg, #10b981, #059669)',
                                       borderRadius: 2,
+                                      textTransform: 'none',
+                                      fontWeight: 600,
                                       '&:hover': {
-                                        background: 'linear-gradient(135deg, #5a67d8, #6b46c1)'
+                                        background: 'linear-gradient(135deg, #059669, #047857)',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
                                       }
                                     }}
                                   >
@@ -1139,13 +1339,15 @@ export default function UserProfile() {
                                     variant="outlined"
                                     size="small"
                                     sx={{
-                                      borderColor: '#667eea',
-                                      color: '#667eea',
+                                      borderColor: '#10b981',
+                                      color: '#10b981',
                                       borderRadius: 2,
+                                      textTransform: 'none',
+                                      fontWeight: 600,
                                       '&:hover': {
-                                        borderColor: '#5a67d8',
-                                        color: '#5a67d8',
-                                        background: 'rgba(102, 126, 234, 0.05)'
+                                        borderColor: '#059669',
+                                        color: '#059669',
+                                        background: 'rgba(16, 185, 129, 0.05)'
                                       }
                                     }}
                                   >
@@ -1159,30 +1361,55 @@ export default function UserProfile() {
                       ) : (
                         <Box sx={{ 
                           textAlign: 'center', 
-                          py: 6,
-                          border: '2px dashed rgba(226, 232, 240, 0.9)',
-                          borderRadius: 3,
-                          background: 'linear-gradient(180deg, rgba(250, 250, 255, 0.6), rgba(255, 255, 255, 0.8))'
+                          py: 8,
+                          border: '2px dashed rgba(16, 185, 129, 0.3)',
+                          borderRadius: 4,
+                          background: 'linear-gradient(180deg, rgba(236, 253, 245, 0.6), rgba(255, 255, 255, 0.8))'
                         }}>
                           <Box sx={{
-                            width: 72,
-                            height: 72,
+                            width: 80,
+                            height: 80,
                             borderRadius: '50%',
-                            background: 'rgba(102, 126, 234, 0.08)',
+                            background: 'rgba(16, 185, 129, 0.1)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             mx: 'auto',
-                            mb: 2
+                            mb: 3,
+                            animation: 'pulse 2s infinite',
+                            '@keyframes pulse': {
+                              '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                              '50%': { transform: 'scale(1.05)', opacity: 0.8 }
+                            }
                           }}>
-                            <OrderIcon sx={{ fontSize: 32, color: '#667eea' }} />
+                            <OrderIcon sx={{ fontSize: 40, color: '#10b981' }} />
                           </Box>
-                          <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, color: '#0F172A' }}>
+                          <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, color: '#0F172A' }}>
                             No Orders Yet
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280, mx: 'auto', lineHeight: 1.5 }}>
-                            Start shopping to see your order history and track your purchases here
+                          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto', lineHeight: 1.6, mb: 3 }}>
+                            Start shopping to see your order history and track your purchases here. Get groceries delivered in 12 minutes! ⚡
                           </Typography>
+                          <Button
+                            variant="contained"
+                            onClick={() => window.location.href = '/'}
+                            sx={{
+                              background: 'linear-gradient(135deg, #10b981, #059669)',
+                              borderRadius: 3,
+                              px: 4,
+                              py: 1.5,
+                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                              textTransform: 'none',
+                              fontWeight: 600,
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #059669, #047857)',
+                                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
+                                transform: 'translateY(-2px)'
+                              }
+                            }}
+                          >
+                            Start Shopping
+                          </Button>
                         </Box>
                       )}
                     </Box>
@@ -1279,14 +1506,16 @@ export default function UserProfile() {
             onClick={handlePasswordChange}
             disabled={isSaving}
             sx={{
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
               borderRadius: 3,
               px: 3,
               py: 1.5,
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+              textTransform: 'none',
+              fontWeight: 600,
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a67d8, #6b46c1)',
-                boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)'
+                background: 'linear-gradient(135deg, #059669, #047857)',
+                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)'
               }
             }}
           >

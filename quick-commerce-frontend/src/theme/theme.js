@@ -3,15 +3,21 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2563eb',
-      light: '#60a5fa',
-      dark: '#1e40af',
+      main: '#10b981', // Quick Commerce Green
+      light: '#34d399',
+      dark: '#059669',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#059669',
-      light: '#10b981',
-      dark: '#047857',
+      main: '#f59e0b', // Urgency Orange
+      light: '#fbbf24',
+      dark: '#d97706',
+      contrastText: '#ffffff',
+    },
+    error: {
+      main: '#ef4444', // Popular/Alert Red
+      light: '#f87171',
+      dark: '#dc2626',
       contrastText: '#ffffff',
     },
     neutral: {
@@ -86,15 +92,15 @@ const theme = createTheme({
           },
         },
         containedPrimary: {
-          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
+            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
           },
         },
         containedSecondary: {
-          background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
+            background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
           },
         },
       },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Container, Typography, Fade, Alert, Button } from "@mui/material";
+import { Box, CircularProgress, Container, Typography, Fade, Alert, Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../features/cart/CartContext";
 import ProductCarousel from "../features/products/ProductCarousel";
@@ -7,6 +7,8 @@ import ProductGrid from "../features/products/ProductGrid";
 import { PageSkeleton } from "../components/common/LoadingStates";
 import RetryComponent from "../components/common/RetryComponent";
 import ModernHero from "../layouts/ModernHero";
+import SmartCategoryNav from "../features/products/SmartCategoryNav";
+import SmartSearchResults from "../features/products/SmartSearchResults";
 
 import apiService from "../services/apiService";
 import { withCache } from "../utils/cache";
@@ -22,6 +24,15 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const resultsRef = React.useRef(null);
+
+  // Mock data for trending items
+  const trendingInArea = [
+    { id: 1, name: 'Ice Cream - Amul', price: 120, image: '', orders: 45, deliveryTime: 8 },
+    { id: 2, name: 'Cold Drinks - Coca Cola', price: 40, image: '', orders: 38, deliveryTime: 10 },
+    { id: 3, name: 'Chips - Lays', price: 20, image: '', orders: 52, deliveryTime: 12 },
+    { id: 4, name: 'Chocolate - Dairy Milk', price: 85, image: '', orders: 29, deliveryTime: 15 }
+  ];
 
   const handleFilterApply = async (filters) => {
     try {
@@ -40,6 +51,18 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
       onFilterApply.current = handleFilterApply;
     }
   }, [onFilterApply]);
+
+  // Auto-scroll to results when search query changes
+  useEffect(() => {
+    if (searchQuery && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -100,7 +123,91 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
   return (
     <Box sx={{ minHeight: '100vh', width: '100%', bgcolor: '#f8fafc' }}>
       <ModernHero />
-      <Container maxWidth="xl" sx={{ py: 6 }} id="products-section">
+      {/* Smart Category Navigation */}
+      <Container maxWidth="xl">
+        <SmartCategoryNav categories={localCategories} />
+      </Container>
+
+
+
+      {/* Trending in Your Area */}
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#111827' }}>
+            🔥 Trending in Rajkot
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#ef4444', fontWeight: 600 }}>
+            Hot right now
+          </Typography>
+        </Box>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, 
+          gap: 2, 
+          mb: 6 
+        }}>
+          {trendingInArea.map((item, index) => (
+            <Fade in={true} timeout={500 + index * 100} key={item.id}>
+              <Box sx={{
+                p: 2,
+                bgcolor: 'white',
+                borderRadius: 2,
+                border: '1px solid #e5e7eb',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)',
+                  borderColor: '#ef4444'
+                }
+              }}>
+                <Chip
+                  label={`${item.orders} ordered today`}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    bgcolor: '#ef4444',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.7rem',
+                    height: '18px'
+                  }}
+                />
+                <Box sx={{ 
+                  height: 60, 
+                  bgcolor: '#f3f4f6', 
+                  borderRadius: 1, 
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem'
+                }}>
+                  🔥
+                </Box>
+                <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', mb: 0.5, color: '#111827' }}>
+                  {item.name}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ color: '#10b981', fontWeight: 700, fontSize: '0.9rem' }}>
+                    ₹{item.price}
+                  </Typography>
+                  <Typography sx={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                    {item.deliveryTime} mins
+                  </Typography>
+                </Box>
+              </Box>
+            </Fade>
+          ))}
+        </Box>
+      </Container>
+
+
+
+      <Container maxWidth="xl" sx={{ py: 2 }} id="products-section" ref={resultsRef}>
             {showFilters ? (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -131,50 +238,12 @@ export default function HomePage({ searchQuery, searchResults, onFilterApply }) 
             )}
           </Box>
         ) : searchQuery ? (
-              <Box>
-                <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-                  Search Results for "{searchQuery}"
-                </Typography>
-                {searchResults?.length > 0 ? (
-                  <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                      <Typography variant="h6" sx={{ color: 'var(--muted)' }}>
-                        Found {searchResults.length} products
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
-                        sx={{ borderColor: 'var(--brand)', color: 'var(--brand)' }}
-                      >
-                        {viewMode === 'carousel' ? 'Grid View' : 'Carousel View'}
-                      </Button>
-                    </Box>
-                    {viewMode === 'grid' ? (
-                      <ProductGrid
-                        products={searchResults}
-                        onAddToCart={addToCart}
-                        viewMode="grid"
-                      />
-                    ) : (
-                      <ProductCarousel
-                        products={searchResults}
-                        categoryName={`Search Results`}
-                        onAddToCart={addToCart}
-                        showSeeAll={false}
-                      />
-                    )}
-                  </Box>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <Typography variant="h5" color="text.secondary">
-                      No products found
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                      Try searching with different keywords
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
+              <SmartSearchResults
+                searchQuery={searchQuery}
+                results={searchResults}
+                onAddToCart={addToCart}
+                loading={false}
+              />
             ) : (
               localCategories.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8 }}>

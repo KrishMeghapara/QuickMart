@@ -34,6 +34,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./theme/theme";
 import "./App.css";
+import "./styles/quickcommerce.css";
 
 function AuthRoutes() {
   const { isAuthenticated, login, logout, user } = useAuth();

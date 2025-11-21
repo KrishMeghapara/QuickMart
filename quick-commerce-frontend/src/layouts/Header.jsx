@@ -14,6 +14,7 @@ import {
   Divider,
   Avatar,
   Chip,
+  Button,
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import {
@@ -25,6 +26,9 @@ import {
   Notifications as NotificationsIcon,
   Favorite as FavoriteIcon,
   FilterList as FilterListIcon,
+  LocationOn as LocationIcon,
+  AccessTime as ClockIcon,
+  FlashOn as LightningIcon,
 } from '@mui/icons-material';
 import { useCart } from '../features/cart/CartContext';
 import { useAuth } from '../features/auth/AuthContext';
@@ -156,7 +160,10 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+  const [locationAnchorEl, setLocationAnchorEl] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentLocation, setCurrentLocation] = useState('Rajkot, Gujarat');
+  const [deliveryTime, setDeliveryTime] = useState('12');
   const [filters, setFilters] = useState({
     categoryId: '',
     minPrice: '',
@@ -190,6 +197,14 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
     closeFilterMenu();
   };
 
+  const handleLocationClick = (event) => setLocationAnchorEl(event.currentTarget);
+  const closeLocationMenu = () => setLocationAnchorEl(null);
+  const handleLocationChange = (location, time) => {
+    setCurrentLocation(location);
+    setDeliveryTime(time);
+    closeLocationMenu();
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -202,16 +217,16 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
         height: '72px'
       }}
     >
-      <Toolbar sx={{ 
-        justifyContent: 'space-between', 
-        py: { xs: 1, sm: 1.5 }, 
+      <Toolbar sx={{
+        justifyContent: 'space-between',
+        py: { xs: 1, sm: 1.5 },
         px: { xs: 1, sm: 2, md: 4 },
         minHeight: { xs: '56px', sm: '64px' },
         flexWrap: { xs: 'wrap', md: 'nowrap' }
       }}>
         {/* Logo */}
         <LogoContainer onClick={() => navigate('/')}>
-          <StorefrontIcon sx={{ fontSize: 36, color: 'var(--brand)' }} />
+          <LightningIcon sx={{ fontSize: 36, color: '#10b981' }} />
           <Typography
             variant="h4"
             sx={{
@@ -227,27 +242,76 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
             label="Express"
             size="small"
             sx={{
-              background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
-              color: '#0c4a6e',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: 'white',
               fontWeight: 600,
               fontSize: '0.7rem',
               height: '20px',
-              boxShadow: 'var(--glow-purple)'
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
             }}
           />
         </LogoContainer>
 
+        {/* Delivery Info */}
+        <Box sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center',
+          ml: 3,
+          order: { xs: 4, md: 1.5 }
+        }}>
+          <Button
+            onClick={handleLocationClick}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              textTransform: 'none',
+              color: 'var(--text)',
+              bgcolor: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: '12px',
+              px: 2,
+              py: 1,
+              '&:hover': {
+                bgcolor: 'rgba(16, 185, 129, 0.15)',
+                borderColor: 'rgba(16, 185, 129, 0.3)'
+              }
+            }}
+          >
+            <ClockIcon sx={{ fontSize: 18, color: '#10b981' }} />
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography sx={{
+                fontSize: '0.75rem',
+                color: '#10b981',
+                fontWeight: 600,
+                lineHeight: 1
+              }}>
+                Delivering in {deliveryTime} mins
+              </Typography>
+              <Typography sx={{
+                fontSize: '0.8rem',
+                color: 'var(--text)',
+                fontWeight: 500,
+                lineHeight: 1.2
+              }}>
+                <LocationIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                {currentLocation}
+              </Typography>
+            </Box>
+          </Button>
+        </Box>
+
         {/* Enhanced Search */}
-        <Box sx={{ 
-          flexGrow: 1, 
-          mx: { xs: 1, sm: 2, md: 4 }, 
-          display: 'flex', 
+        <Box sx={{
+          flexGrow: 1,
+          mx: { xs: 1, sm: 2, md: 4 },
+          display: 'flex',
           justifyContent: 'center',
           order: { xs: 3, md: 2 },
           width: { xs: '100%', md: 'auto' },
           mt: { xs: 1, md: 0 }
         }}>
-          <EnhancedSearch 
+          <EnhancedSearch
             onSearch={(query) => {
               setSearchQuery(query);
               onSearch?.(query);
@@ -257,9 +321,9 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
         </Box>
 
         {/* Icons */}
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
           gap: { xs: 1, sm: 2 },
           order: { xs: 2, md: 3 }
         }}>
@@ -334,6 +398,76 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
         </MenuItem>
       </Menu>
 
+      {/* Location Menu */}
+      <Menu
+        anchorEl={locationAnchorEl}
+        open={Boolean(locationAnchorEl)}
+        onClose={closeLocationMenu}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        PaperProps={{
+          sx: {
+            mt: 1.5,
+            minWidth: 300,
+            borderRadius: 3,
+            backdropFilter: 'blur(20px)',
+            background: 'var(--glass)',
+            border: '1px solid var(--border)',
+            p: 2
+          }
+        }}
+      >
+        <Typography variant="h6" sx={{ color: 'var(--text)', mb: 2, fontWeight: 600 }}>
+          <LocationIcon sx={{ mr: 1, color: '#10b981' }} />
+          Select Delivery Location
+        </Typography>
+
+        {[
+          { location: 'Rajkot, Gujarat', time: '12', area: 'University Road' },
+          { location: 'Ahmedabad, Gujarat', time: '15', area: 'Satellite' },
+          { location: 'Surat, Gujarat', time: '18', area: 'Adajan' },
+          { location: 'Vadodara, Gujarat', time: '14', area: 'Alkapuri' }
+        ].map((loc, idx) => (
+          <MenuItem
+            key={idx}
+            onClick={() => handleLocationChange(loc.location, loc.time)}
+            sx={{
+              borderRadius: 2,
+              mb: 1,
+              border: currentLocation === loc.location ? '2px solid #10b981' : '1px solid transparent',
+              bgcolor: currentLocation === loc.location ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+            }}
+          >
+            <Box sx={{ width: '100%' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography sx={{ fontWeight: 600, color: 'var(--text)' }}>
+                  {loc.location}
+                </Typography>
+                <Chip
+                  label={`${loc.time} mins`}
+                  size="small"
+                  sx={{
+                    bgcolor: '#10b981',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                />
+              </Box>
+              <Typography variant="body2" sx={{ color: 'var(--muted)', mt: 0.5 }}>
+                {loc.area} area
+              </Typography>
+            </Box>
+          </MenuItem>
+        ))}
+
+        <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(16, 185, 129, 0.1)', borderRadius: 2 }}>
+          <Typography variant="body2" sx={{ color: '#10b981', fontWeight: 600 }}>
+            🚀 Express delivery available in selected areas
+          </Typography>
+        </Box>
+      </Menu>
+
       {/* Filter Menu */}
       <Menu
         anchorEl={filterAnchorEl}
@@ -356,7 +490,35 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
         <Typography variant="h6" sx={{ color: 'var(--text)', mb: 2, fontWeight: 600 }}>
           Filter Products
         </Typography>
-        
+
+        {/* Quick Filters */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="body2" sx={{ color: 'var(--muted)', mb: 1 }}>Quick Filters</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {[
+              { label: 'Under 10 mins', icon: '⚡' },
+              { label: 'Fresh Produce', icon: '🥬' },
+              { label: 'Dairy & Eggs', icon: '🥛' },
+              { label: 'Snacks', icon: '🍿' }
+            ].map((filter, idx) => (
+              <Chip
+                key={idx}
+                label={`${filter.icon} ${filter.label}`}
+                size="small"
+                clickable
+                sx={{
+                  bgcolor: 'rgba(16, 185, 129, 0.1)',
+                  color: '#10b981',
+                  fontWeight: 500,
+                  '&:hover': {
+                    bgcolor: 'rgba(16, 185, 129, 0.2)'
+                  }
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+
         {/* Category */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" sx={{ color: 'var(--muted)', mb: 1 }}>Category</Typography>
@@ -447,6 +609,7 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
             <option value="name_desc">Name Z-A</option>
             <option value="price_asc">Price Low-High</option>
             <option value="price_desc">Price High-Low</option>
+            <option value="delivery_time">Fastest Delivery</option>
           </select>
         </Box>
 
@@ -481,7 +644,7 @@ export default function Header({ onCartClick, onSearch, onFilterApply, categorie
               padding: '10px',
               borderRadius: '8px',
               border: 'none',
-              backgroundColor: 'var(--brand)',
+              backgroundColor: '#10b981',
               color: 'white',
               fontWeight: 600,
               cursor: 'pointer'

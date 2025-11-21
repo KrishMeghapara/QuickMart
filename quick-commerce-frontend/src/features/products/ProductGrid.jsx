@@ -16,11 +16,16 @@ import {
 import { useNavigate } from 'react-router-dom';
 import {
   Add as AddIcon,
+  Remove as RemoveIcon,
   FavoriteBorder as FavoriteIcon,
   Favorite as FavoriteFilledIcon,
   ShoppingCart as CartIcon,
   Visibility as ViewIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  AccessTime as ClockIcon,
+  LocalShipping as ShippingIcon,
+  Whatshot as FireIcon,
+  FlashOn as LightningIcon
 } from '@mui/icons-material';
 import { colors, shadows, transitions } from '../../theme/designTokens';
 
@@ -32,7 +37,39 @@ export default function ProductGrid({
 }) {
   const [favorites, setFavorites] = useState(new Set());
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
+
+  const updateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      const newQuantities = { ...quantities };
+      delete newQuantities[productId];
+      setQuantities(newQuantities);
+    } else {
+      setQuantities(prev => ({ ...prev, [productId]: newQuantity }));
+    }
+  };
+
+  const getDeliveryTime = (product) => {
+    // Generate consistent delivery time based on product ID
+    const seed = product.productID || 1;
+    const baseTime = 12;
+    const variation = (seed * 7) % 6; // 0-5 mins variation, consistent per product
+    return baseTime + variation;
+  };
+
+  const getStockLevel = (product) => {
+    // Generate consistent stock level based on product ID
+    const seed = product.productID || 1;
+    return ((seed * 13) % 20) + 1; // 1-20, consistent per product
+  };
+
+  const isLowStock = (stockLevel) => stockLevel <= 5;
+  const isPopular = (product) => {
+    // Generate consistent popularity based on product ID
+    const seed = product.productID || 1;
+    return (seed * 11) % 10 < 3; // 30% chance, consistent per product
+  };
 
   const toggleFavorite = (productId) => {
     const newFavorites = new Set(favorites);
@@ -161,20 +198,55 @@ export default function ProductGrid({
                 
 
 
-                {/* Stock Status */}
+                {/* Delivery Time Badge */}
                 <Chip
-                  label={product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
+                  icon={<ClockIcon sx={{ fontSize: 14 }} />}
+                  label={`${getDeliveryTime(product)} mins`}
                   size="small"
                   sx={{
                     position: 'absolute',
                     top: 8,
                     left: 8,
-                    backgroundColor: product.stockQuantity > 0 ? '#10b981' : '#ef4444',
+                    backgroundColor: '#10b981',
                     color: 'white',
                     fontWeight: 600,
-                    fontSize: '0.75rem'
+                    fontSize: '0.75rem',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
                   }}
                 />
+
+                {/* Urgency Indicators */}
+                <Box sx={{ position: 'absolute', top: 8, right: 8, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  {isLowStock(getStockLevel(product)) && (
+                    <Chip
+                      icon={<FireIcon sx={{ fontSize: 12 }} />}
+                      label={`Only ${getStockLevel(product)} left!`}
+                      size="small"
+                      sx={{
+                        backgroundColor: '#f59e0b',
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        height: '20px',
+                        animation: 'pulse 2s infinite'
+                      }}
+                    />
+                  )}
+                  {isPopular(product) && (
+                    <Chip
+                      icon={<LightningIcon sx={{ fontSize: 12 }} />}
+                      label="Popular"
+                      size="small"
+                      sx={{
+                        backgroundColor: '#ef4444',
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        height: '20px'
+                      }}
+                    />
+                  )}
+                </Box>
 
                 {/* Quick View Button */}
                 {hoveredProduct === product.productID && (
@@ -184,9 +256,9 @@ export default function ProductGrid({
                         position: 'absolute',
                         bottom: 8,
                         right: 8,
-                        backgroundColor: 'rgba(37, 99, 235, 0.9)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.9)',
                         color: 'white',
-                        '&:hover': { backgroundColor: '#2563eb' }
+                        '&:hover': { backgroundColor: '#10b981' }
                       }}
                     >
                       <ViewIcon />
@@ -242,39 +314,97 @@ export default function ProductGrid({
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: '#10b981',
-                      fontSize: '1.25rem'
-                    }}
-                  >
-                    ₹{product.productPrice}
-                  </Typography>
+                  <Box>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 700,
+                        color: '#10b981',
+                        fontSize: '1.4rem'
+                      }}
+                    >
+                      ₹{product.productPrice}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#6b7280', display: 'flex', alignItems: 'center' }}>
+                      <ShippingIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                      Free delivery
+                    </Typography>
+                  </Box>
                   
-                  <Tooltip title="Add to Cart">
+                  {/* Quick Add Controls */}
+                  {quantities[product.productID] ? (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      bgcolor: '#f3f4f6',
+                      borderRadius: '12px',
+                      border: '2px solid #10b981'
+                    }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(product.productID, quantities[product.productID] - 1);
+                        }}
+                        sx={{
+                          color: '#10b981',
+                          width: 32,
+                          height: 32,
+                          '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)' }
+                        }}
+                      >
+                        <RemoveIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                      <Typography sx={{ 
+                        mx: 1.5, 
+                        fontWeight: 700, 
+                        color: '#10b981',
+                        minWidth: 20,
+                        textAlign: 'center'
+                      }}>
+                        {quantities[product.productID]}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(product.productID, quantities[product.productID] + 1);
+                          onAddToCart?.(product);
+                        }}
+                        sx={{
+                          color: '#10b981',
+                          width: 32,
+                          height: 32,
+                          '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)' }
+                        }}
+                      >
+                        <AddIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Box>
+                  ) : (
                     <Button
                       variant="contained"
                       size="small"
                       disabled={product.stockQuantity === 0}
                       onClick={(e) => {
                         e.stopPropagation();
+                        updateQuantity(product.productID, 1);
                         onAddToCart?.(product);
                       }}
                       aria-label={`Add ${product.productName} to cart`}
                       sx={{
-                        minWidth: 'auto',
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
+                        background: 'linear-gradient(135deg, #10b981, #059669)',
+                        color: 'white',
+                        fontWeight: 600,
+                        px: 3,
+                        py: 1,
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+                          background: 'linear-gradient(135deg, #059669, #047857)',
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 6px 16px rgba(37, 99, 235, 0.4)',
+                          boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
                         },
                         '&:disabled': {
                           background: '#d1d5db',
@@ -282,9 +412,9 @@ export default function ProductGrid({
                         }
                       }}
                     >
-                      <AddIcon />
+                      ADD
                     </Button>
-                  </Tooltip>
+                  )}
                 </Box>
               </CardContent>
             </Card>
